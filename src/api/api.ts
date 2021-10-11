@@ -56,7 +56,7 @@ export default class ApiManager {
         const queryDate = lastSyncDate ? `&search_after=${moment.utc(lastSyncDate).format()}` : '';
 
         try{
-            response = await fetch(`${BASEURL}/search?user=${this.userid}&limit=200&sort=created&order=asc`+queryDate, {headers: {...this.getHeaders()}})
+            response = await fetch(`${BASEURL}/search?user=${this.userid}&limit=100&sort=created&order=asc`+queryDate, {headers: {...this.getHeaders()}})
         }
         catch (e) {
             new Notice('Error occurs. Please check your API token and try again.')
