@@ -10,5 +10,12 @@ package-lock.json
 main.js
 *.js.map
 
-# obsidian
+# obsidian plugin files
+main.js
+main.js.map
 data.json
+
+coverage
+dist
+tsconfig.tsbuildinfo
+.DS_Store

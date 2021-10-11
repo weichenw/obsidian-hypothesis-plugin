@@ -1,0 +1,1 @@
+export const BASEURL: string = "https://hypothes.is/api";
