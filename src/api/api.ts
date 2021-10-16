@@ -1,7 +1,6 @@
 
 import {BASEURL} from './baseUrl';
-import { Notice } from 'obsidian';
-import moment from 'moment';
+import { Notice, moment } from 'obsidian';
 
 export default class ApiManager {
 
