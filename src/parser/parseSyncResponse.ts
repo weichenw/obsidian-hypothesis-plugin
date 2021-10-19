@@ -1,7 +1,7 @@
 import md5 from 'crypto-js/md5';
 
 const parseAuthorUrl = (url: string) => {
-    let domain = (new URL(url));
+    const domain = (new URL(url));
     const author = domain.hostname.replace('www.','');
     return author;
 }

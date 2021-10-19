@@ -16,16 +16,16 @@ export default class HypothesisPlugin extends Plugin {
 
 		await initialise(this);
 
-		const fileManager = new FileManager(this.app.vault, this.app.metadataCache);
+		const fileManager = new FileManager(this.app.vault);
 
 		this.syncHypothesis = new SyncHypothesis(fileManager);
 
 		this.addRibbonIcon('hypothesisIcon', 'Sync your hypothesis highlights', () => {
-			 if (!get(settingsStore).isConnected) {
+			if (!get(settingsStore).isConnected) {
 				new Notice('Please configure Hypothesis API token in the plugin setting');
-			 } else {
+			} else {
 				this.startSync();
-			 }
+			}
 		});
 
 		// this.addStatusBarItem().setText('Status Bar Text');

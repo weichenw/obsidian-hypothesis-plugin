@@ -19,3 +19,4 @@ coverage
 dist
 tsconfig.tsbuildinfo
 .DS_Store
+main.js.LICENSE.txt

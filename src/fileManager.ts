@@ -1,4 +1,4 @@
-import type {  MetadataCache, Vault } from 'obsidian';
+import type {  Vault } from 'obsidian';
 import { get } from 'svelte/store';
 import { Renderer } from '~/renderer';
 import { settingsStore } from '~/store';
@@ -10,15 +10,11 @@ const articleFilePath = (articleTitle: string): string => {
   return `${get(settingsStore).highlightsFolder}/${fileName}.md`;
 };
 
-type SyncingState = {
-  title: string;
-};
-
 export default class FileManager {
   private vault: Vault;
   private renderer: Renderer;
 
-  constructor(vault: Vault, metadataCache: MetadataCache) {
+  constructor(vault: Vault) {
     this.vault = vault;
     this.renderer = new Renderer();
   }
@@ -30,7 +26,7 @@ export default class FileManager {
 
   public async createOrUpdate(article: Article): Promise<boolean> {
     const filePath = articleFilePath(article.metadata.title);
-    let createdNewArticle: boolean = false;
+    let createdNewArticle = false;
 
     if (!(await this.vault.adapter.exists(filePath))) {
 

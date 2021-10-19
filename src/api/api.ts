@@ -1,9 +1,8 @@
 
-import {BASEURL} from './baseUrl';
 import { Notice, moment } from 'obsidian';
 
 export default class ApiManager {
-
+   readonly baseUrl: string = 'https://hypothes.is/api';
    private token: string;
    private userid: string;
 
@@ -24,7 +23,7 @@ export default class ApiManager {
         let data;
 
         try{
-            response = await fetch(`${BASEURL}/profile`, {headers: {...this.getHeaders()}})
+            response = await fetch(`${this.baseUrl}/profile`, {headers: {...this.getHeaders()}})
         }
         catch (e) {
             new Notice('Authorization failed. Please check your API token and try again.')
@@ -55,7 +54,7 @@ export default class ApiManager {
         const queryDate = lastSyncDate ? `&search_after=${moment.utc(lastSyncDate).format()}` : '';
 
         try{
-            response = await fetch(`${BASEURL}/search?user=${this.userid}&limit=100&sort=created&order=asc`+queryDate, {headers: {...this.getHeaders()}})
+            response = await fetch(`${this.baseUrl}/search?user=${this.userid}&limit=100&sort=created&order=asc`+queryDate, {headers: {...this.getHeaders()}})
         }
         catch (e) {
             new Notice('Error occurs. Please check your API token and try again.')
