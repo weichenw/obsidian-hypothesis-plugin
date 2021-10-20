@@ -18,7 +18,6 @@ export type Highlights = {
   text: string;
   incontext: string;
   user: string;
-  location: string;
   annotation: string;
   tags: string[];
 };
@@ -34,7 +33,6 @@ export type RenderTemplate = {
     createdOn?: string;
     updatedOn?: string;
     user?: string;
-    location: string;
     annotation: string;
     tags: string[];
   }[];

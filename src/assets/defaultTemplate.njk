@@ -7,6 +7,7 @@
 - Category: #article{% endif %}
 
 {% if is_new_article %}## Highlights{% endif %}
-{% for highlight in highlights %}- {{highlight.text}} — location: [{{highlight.location}}]({{highlight.incontext}})
+{% for highlight in highlights %}- {{highlight.text}} — [view in context]({{highlight.incontext}})
 {% if highlight.tags | length %}   - Tags: {% for tag in highlight.tags %}#{{tag| replace(" ", "-")}} {% endfor %}{% endif %}
-{% if highlight.annotation %}   - Annotation: {{highlight.annotation}}{% endif %}{% endfor %}
+{% if highlight.annotation %}   - Annotation: {{highlight.annotation}}{% endif %}
+{% endfor %}
