@@ -48,29 +48,60 @@ export default class ApiManager {
   }
 
   async getHighlights(lastSyncDate?: Date){
+        let offset = 0;
+        let maxResult = 2000;
+        let initialQuery = true;
+        let result= [];
         let response;
-        let data;
 
         const queryDate = lastSyncDate ? `&search_after=${moment.utc(lastSyncDate).format()}` : '';
+        const limit = lastSyncDate ? 200 : 100;
 
-        try{
-          response = await fetch(`${this.baseUrl}/search?user=${this.userid}&limit=100&sort=created&order=asc`+queryDate, {headers: {...this.getHeaders()}})
-        }
-        catch (e) {
-            new Notice('Error occurs. Please check your API token and try again.')
-            console.log("Failed to fetch highlights : ", e);
+        for(let resultCount = 0; resultCount < maxResult && offset <= maxResult; offset+= 2){
+
+          try{
+            response = await fetch(`${this.baseUrl}/search?user=${this.userid}&offset=${offset}&limit=${limit}&sort=created&order=asc`+queryDate, {headers: {...this.getHeaders()}})
+          }
+          catch (e) {
+              new Notice('Error occurs. Please check your API token and try again.')
+              console.log("Failed to fetch highlights : ", e);
+              return;
+          }
+
+          console.log(response);
+          if (response && response.ok) {
+            const data = await response.json();
+
+            if(!data.rows.length){
+              break;
+            }
+
+            //initial run to set total
+            if(initialQuery){
+              if(data.total <= maxResult){
+              //overwrite total
+              maxResult = data.total;
+              //no longer inital query to find total
+              initialQuery = !initialQuery;
+              }
+            }
+
+            resultCount += data.rows.length;
+            result = [...result, ...data.rows];
+
+            //break loop. pagination doesnt work with search_after param
+            if(lastSyncDate){
+              break;
+            }
+
+          } else {
+            new Notice('Sync failed. Please check your API token and try again.')
+            console.log("Failed to fetch highlights : ", response);
             return;
+          }
+
+
         }
-
-         if (response && response.ok) {
-          data = await response.json();
-
-        } else {
-          new Notice('Sync failed. Please check your API token and try again.')
-          console.log("Failed to fetch highlights : ", response);
-          return;
-        }
-
-        return data.rows;
+        return result;
   }
 }
