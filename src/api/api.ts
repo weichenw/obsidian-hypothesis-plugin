@@ -49,7 +49,7 @@ export default class ApiManager {
 
   async getHighlights(lastSyncDate?: Date){
         let offset = 0;
-        let maxResult = 2000;
+        let maxResult = 1000;
         let initialQuery = true;
         let result= [];
         let response;
