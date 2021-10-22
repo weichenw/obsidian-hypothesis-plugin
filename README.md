@@ -1,18 +1,20 @@
 ## Obsidian Hypothesis Plugin (Community Plugin)
 
-Obsidian Hypothesis (Community Plugin) is an unofficial plugin to synchronize [Hypothesis](https://hypothes.is/) highlights into your Obsidian Vault.
+Obsidian Hypothesis (Community Plugin) is an unofficial plugin to synchronize [Hypothesis](https://hypothes.is/) **web** article highlights/annotations into your Obsidian Vault.
 
 <a href="https://www.buymeacoffee.com/fatwombat"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=fatwombat&button_colour=BD5FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00"></a>
 
 ### Features
 
-- Sync article highlights on Obsidian startup or manual trigger
+- Sync web article highlights/annotations on Obsidian startup or manual trigger
 - Update existing articles with new highlights and annotations
 - Customization highlights through [Nunjucks](https://mozilla.github.io/nunjucks) template
 
 ## Usage
 
 After installing the plugin, configure the the settings of the plugin then initiate the first sync manually. Thereafter, the plugin can be configured to sync automatically or manually
+
+Use Hypothesis icon on the side icon ribbon or command to trigger manual sync.
 
 ### Settings
 
@@ -28,9 +30,11 @@ After installing the plugin, configure the the settings of the plugin then initi
 - Command: Sync new highlights
 - Click: Hypothesis ribbon icon
 
-## Limitations
+## Limitations & caveats
 
-Limit to 100 highlights per sync for performance. Pagination of result sets in the API does not seem to work. Hopefully, this will be fixed in their API v2.0
+- Limit to 1000 highlights on initial sync for performance. Subsequent sync for deltas are capped at 200 as pagination of result sets does not work in conjunction with API search_after parameter.
+- Only tested with Obsidian Mac OSX and Windows 10.
+- Have not tested to sync annotations on PDFs.
 
 ## Acknowledgement
 
