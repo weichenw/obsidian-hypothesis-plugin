@@ -56,7 +56,7 @@ export default class ApiManager {
 
         const queryDate = lastSyncDate ? `&search_after=${moment.utc(lastSyncDate).format()}` : '';
         // const limit = lastSyncDate ? 200 : 100;
-        const limit = 50;
+        const limit = 100;
 
         for(let resultCount = 0; resultCount < maxResult && offset <= maxResult; offset+= 2){
 
