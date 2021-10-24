@@ -37,3 +37,8 @@ export type RenderTemplate = {
     tags: string[];
   }[];
 };
+
+export type SyncedFile = {
+  filename: string,
+  uri: string
+}

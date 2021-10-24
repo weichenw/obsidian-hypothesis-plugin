@@ -7,6 +7,7 @@ import { Renderer } from '~/renderer';
 import { settingsStore } from '~/store';
 import { TokenManager } from '~/store/tokenManager';
 import ApiTokenModal from '~/modals/apiTokenModal';
+import ResyncDelFileModal from '~/modals/resyncDelFileModal';
 
 const { moment } = window;
 
@@ -169,4 +170,27 @@ export class SettingsTab extends PluginSettingTab {
           });
       });
   }
+
+  private async resyncDeletedFile(): Promise<void> {
+      new Setting(this.containerEl)
+      .setName('Sync deleted file')
+      .setDesc('Manually sync a deleted file')
+      .addButton((button) => {
+        return button
+          .setButtonText('Show deleted file(s)')
+          .setCta()
+          .onClick(async () => {
+            button
+              .removeCta()
+              .setButtonText('Resync deleted file..')
+              .setDisabled(true);
+
+            const resyncDelFileModal = new ResyncDelFileModal(this.app);
+            await resyncDelFileModal.waitForClose;
+
+            this.display(); // rerender
+          });
+      });
+   }
+
 }

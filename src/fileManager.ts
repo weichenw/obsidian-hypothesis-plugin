@@ -5,8 +5,8 @@ import { settingsStore } from '~/store';
 import { sanitizeTitle } from '~/utils/sanitizeTitle';
 import type { Article } from '~/models';
 
-const articleFilePath = (articleTitle: string): string => {
-  const fileName = sanitizeTitle(articleTitle);
+const articleFilePath = (fileName: string): string => {
+  // const fileName = sanitizeTitle(articleTitle);
   return `${get(settingsStore).highlightsFolder}/${fileName}.md`;
 };
 
@@ -25,7 +25,8 @@ export default class FileManager {
   }
 
   public async createOrUpdate(article: Article): Promise<boolean> {
-    const filePath = articleFilePath(article.metadata.title);
+    const fileName = sanitizeTitle(article.metadata.title);
+    const filePath = articleFilePath(fileName);
     let createdNewArticle = false;
 
     if (!(await this.vault.adapter.exists(filePath))) {
@@ -34,6 +35,7 @@ export default class FileManager {
       const content = this.renderer.render(article);
       await this.createFile(filePath,article, content);
       createdNewArticle = true;
+      await settingsStore.actions.addSyncedFile({filename: `${fileName}.md`, uri: encodeURIComponent(article.metadata.url)});
     }
     else {
 
@@ -47,5 +49,6 @@ export default class FileManager {
 
     return createdNewArticle;
   }
+
 }
 

@@ -69,7 +69,6 @@ export default class ApiManager {
               return;
           }
 
-          console.log(response);
           if (response && response.ok) {
             const data = await response.json();
 
@@ -104,5 +103,35 @@ export default class ApiManager {
 
         }
         return result;
+  }
+
+  async getHighlightWithUri(uri: string){
+
+        let result= [];
+        let response;
+        const limit = 200;
+
+          try{
+            response = await fetch(`${this.baseUrl}/search?user=${this.userid}&limit=${limit}&uri=${uri}`, {headers: {...this.getHeaders()}})
+          }
+          catch (e) {
+              new Notice('Error occurs. Please check your API token and try again.')
+              console.log("Failed to fetch highlights : ", e);
+              return;
+          }
+
+          if (response && response.ok) {
+            const data = await response.json();
+
+            result = data.rows;
+
+          } else {
+            new Notice('Sync failed. Please check your API token and try again.')
+            console.log("Failed to fetch highlights : ", response);
+            return;
+          }
+
+        return result;
+
   }
 }

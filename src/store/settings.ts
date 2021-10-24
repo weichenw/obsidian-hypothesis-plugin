@@ -1,3 +1,4 @@
+import type { SyncedFile } from '~/models';
 import { writable } from 'svelte/store';
 import defaultTemplate from '~/assets/defaultTemplate.njk';
 import type HypothesisPlugin from '~/main';
@@ -16,6 +17,7 @@ type Settings = {
   template: string;
   syncOnBoot: boolean;
   history: SyncHistory;
+  syncedFiles: SyncedFile[];
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -29,6 +31,7 @@ const DEFAULT_SETTINGS: Settings = {
     totalArticles: 0,
     totalHighlights: 0,
   },
+  syncedFiles:[]
 };
 
 const createSettingsStore = () => {
@@ -95,9 +98,7 @@ const createSettingsStore = () => {
       state.history.totalArticles = 0;
       state.history.totalHighlights = 0;
       state.lastSyncDate = undefined;
-
-      console.log('after reset ' + { state });
-
+      state.syncedFiles = [];
       return state;
     });
   };
@@ -131,6 +132,14 @@ const createSettingsStore = () => {
     });
   };
 
+  const addSyncedFile = (value: SyncedFile) => {
+    store.update((state) => {
+      const syncFiles = [...state.syncedFiles, value];
+      state.syncedFiles = [...new Set(syncFiles)];
+      return state;
+    });
+  }
+
   return {
     subscribe: store.subscribe,
     initialise,
@@ -143,6 +152,7 @@ const createSettingsStore = () => {
       setTemplate,
       setSyncOnBoot,
       incrementHistory,
+      addSyncedFile,
     },
   };
 };

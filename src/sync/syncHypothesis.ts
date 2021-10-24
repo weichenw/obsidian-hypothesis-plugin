@@ -6,7 +6,6 @@ import parseSyncResponse from '~/parser/parseSyncResponse';
 import type FileManager from '~/fileManager';
 import type { Article } from '~/models';
 
-
 export default class SyncHypothesis {
 
     private syncState: SyncState = { newArticlesSynced: 0, newHighlightsSynced: 0 };
@@ -16,7 +15,8 @@ export default class SyncHypothesis {
         this.fileManager = fileManager;
     }
 
-    async startSync() {
+    async startSync(uri?: string) {
+        console.log(uri)
         this.syncState = { newArticlesSynced: 0, newHighlightsSynced: 0 };
 
         const token = await get(settingsStore).token;
@@ -26,7 +26,7 @@ export default class SyncHypothesis {
 
         syncSessionStore.actions.startSync();
 
-        const responseBody: [] = await apiManager.getHighlights(get(settingsStore).lastSyncDate);
+        const responseBody: [] = (!uri) ?  await apiManager.getHighlights(get(settingsStore).lastSyncDate): await apiManager.getHighlightWithUri(uri);
         const syncedArticles: [] = await parseSyncResponse(responseBody);
 
         syncSessionStore.actions.setJobs(syncedArticles);
