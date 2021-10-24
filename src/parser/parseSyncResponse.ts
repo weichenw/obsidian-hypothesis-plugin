@@ -1,4 +1,5 @@
 import md5 from 'crypto-js/md5';
+import { moment } from 'obsidian';
 
 const parseAuthorUrl = (url: string) => {
     const domain = (new URL(url));
@@ -39,8 +40,8 @@ const parseSyncResponse = async (data) => {
             result[md5Hash].highlights.push(
                 {
                     id: current['id'],
-                    created: current['created'],
-                    updated: current['updated'],
+                    created: moment(current['created']).format('YYYY-MM-DD HH:mm:ss'),
+                    updated: moment(current['updated']).format('YYYY-MM-DD HH:mm:ss'),
                     text: selectorText,
                     incontext: current['links']['incontext'],
                     user: current['user'],

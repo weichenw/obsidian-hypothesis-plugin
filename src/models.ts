@@ -30,8 +30,8 @@ export type RenderTemplate = {
   highlights: {
     text: string;
     incontext?: string;
-    createdOn?: string;
-    updatedOn?: string;
+    created?: string;
+    updated?: string;
     user?: string;
     annotation: string;
     tags: string[];
