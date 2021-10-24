@@ -11,6 +11,11 @@ const parseSyncResponse = async (data) => {
 
         return data.reduce((result, current) => {
 
+            //skip pdf source
+            if((current['uri']).startsWith('urn:x-pdf')){
+                return result;
+            }
+
             const md5Hash = md5(current['uri']);
             let selectorText = 'No highlighted text';
 
