@@ -27,8 +27,10 @@ Use Hypothesis icon on the side icon ribbon or command to trigger manual sync.
 
 ### To sync all new highlights since previous update
 
-- Command: Sync new highlights
 - Click: Hypothesis ribbon icon
+- Command: Sync new highlights
+- Command: Resync deleted file
+  > (Note: Files synced before v0.1.5 will need to reset sync history and delete all synced files to have this feature work properly)
 
 ## Limitations & caveats
 
