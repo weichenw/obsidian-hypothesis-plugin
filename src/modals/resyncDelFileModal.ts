@@ -66,9 +66,7 @@ export default class ResyncDelFileModal extends Modal {
             this[index] = (value.match(r))[0]
         }, existingFiles.files);
 
-        const deletedFiles = syncedFiles.filter((file) =>  !existingFiles.files.includes(file.filename));
-
-        return deletedFiles;
+        return syncedFiles.filter((file) =>  !existingFiles.files.includes(file.filename));
     }
 
     async startResync(uri: string): Promise<void> {
