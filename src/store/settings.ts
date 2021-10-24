@@ -134,8 +134,14 @@ const createSettingsStore = () => {
 
   const addSyncedFile = (value: SyncedFile) => {
     store.update((state) => {
+      const uniqueValuesSet = new Set();
       const syncFiles = [...state.syncedFiles, value];
-      state.syncedFiles = [...new Set(syncFiles)];
+      state.syncedFiles = syncFiles.filter((obj) => {
+        const isPresentInSet = uniqueValuesSet.has(obj.filename);
+        uniqueValuesSet.add(obj.filename);
+        return !isPresentInSet;
+      });
+
       return state;
     });
   }
