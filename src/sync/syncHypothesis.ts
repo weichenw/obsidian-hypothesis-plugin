@@ -15,7 +15,8 @@ export default class SyncHypothesis {
         this.fileManager = fileManager;
     }
 
-    async startSync() {
+    async startSync(uri?: string) {
+        console.log(uri)
         this.syncState = { newArticlesSynced: 0, newHighlightsSynced: 0 };
 
         const token = await get(settingsStore).token;
@@ -25,33 +26,7 @@ export default class SyncHypothesis {
 
         syncSessionStore.actions.startSync();
 
-        const responseBody: [] = await apiManager.getHighlights(get(settingsStore).lastSyncDate);
-        const syncedArticles: [] = await parseSyncResponse(responseBody);
-
-        syncSessionStore.actions.setJobs(syncedArticles);
-
-        if (Object.keys(syncedArticles).length > 0) {
-            await this.syncArticles(syncedArticles);
-        }
-
-        syncSessionStore.actions.completeSync({
-            newArticlesCount: this.syncState.newArticlesSynced,
-            newHighlightsCount: this.syncState.newHighlightsSynced,
-            updatedArticlesCount: 0,
-            updatedHighlightsCount: 0,
-        });
-    }
-
-    async forceSync(uri: string) {
-
-        const token = await get(settingsStore).token;
-        const userid = await get(settingsStore).user;
-
-        const apiManager = new ApiManager(token,userid);
-
-        syncSessionStore.actions.startSync();
-
-        const responseBody: [] = await apiManager.getHighlightWithUri(uri);
+        const responseBody: [] = (!uri) ?  await apiManager.getHighlights(get(settingsStore).lastSyncDate): await apiManager.getHighlightWithUri(uri);
         const syncedArticles: [] = await parseSyncResponse(responseBody);
 
         syncSessionStore.actions.setJobs(syncedArticles);

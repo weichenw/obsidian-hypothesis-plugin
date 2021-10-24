@@ -73,7 +73,7 @@ export default class ResyncDelFileModal extends Modal {
 
     async startResync(uri: string): Promise<void> {
 		console.log('Start syncing...')
-		await this.syncHypothesis.forceSync(uri);
+		await this.syncHypothesis.startSync(uri);
 	}
 }
 
