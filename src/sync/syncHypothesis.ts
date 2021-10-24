@@ -16,7 +16,6 @@ export default class SyncHypothesis {
     }
 
     async startSync(uri?: string) {
-        console.log(uri)
         this.syncState = { newArticlesSynced: 0, newHighlightsSynced: 0 };
 
         const token = await get(settingsStore).token;
