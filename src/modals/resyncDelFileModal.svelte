@@ -22,12 +22,11 @@
         <div class="setting-item-description">
             <div class="ow-dropdown ow-themed">
                 <p>
-                    <Select bind:value={selected} class="ow-themed" isMulti={true} {optionIdentifier} {labelIdentifier}
+                    <Select bind:value={selected} isMulti={true} {optionIdentifier} {labelIdentifier}
                         items={deletedFiles} on:select={handleSelect} on:clear={handleClear}>
                     </Select>
                 </p>
             </div>
-
         </div>
     </div>
 </div>
