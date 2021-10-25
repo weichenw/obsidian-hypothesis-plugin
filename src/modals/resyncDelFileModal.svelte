@@ -1,23 +1,34 @@
 <script lang="ts">
+    import Select from 'svelte-select';
     import type { SyncedFile } from '~/models';
     export let deletedFiles: SyncedFile[];
     export let onSubmit: (value) => void;
     let selected;
-    let disabledButton = deletedFiles.length === 0 ? true : false;
-    let description = disabledButton ? 'No deleted files found...' : 'Select a file to resync from Hypothes.is';
+    let disabledButton = true;
+    let description = deletedFiles.length === 0 ? 'No deleted file(s) found...' : 'Select file(s) to resync from Hypothes.is';
+    let value;
+    const optionIdentifier = 'uri';
+    const labelIdentifier = 'filename';
+    console.log(deletedFiles);
+    function handleSelect(event) {
+        disabledButton = !selected
+    }
+    function handleClear(event) {
+        disabledButton = !selected
+    }
 </script>
+
 <div class="setting-item">
     <div class="setting-item-info">
         <div class="setting-item-description">
-            <p>
-                <select bind:value={selected} class="dropdown ow-dropdown">
-                    {#each deletedFiles as file}
-                    <option value={file}>
-                        {file.filename}
-                    </option>
-                    {/each}
-                </select>
-            </p>
+            <div class="ow-dropdown ow-themed">
+                <p>
+                    <Select bind:value={selected} class="ow-themed" isMulti={true} {optionIdentifier} {labelIdentifier}
+                        items={deletedFiles} on:select={handleSelect} on:clear={handleClear}>
+                    </Select>
+                </p>
+            </div>
+
         </div>
     </div>
 </div>
@@ -42,5 +53,16 @@
 
     .ow-dropdown {
         width: 500px !important;
+    }
+
+    .ow-themed {
+        --border: 3px solid var(--background-modifier-border) !important;
+        --borderRadius: 3px;
+        --placeholderColor: var(--text-muted) !important;
+        --background: var(--background-secondary-alt) !important;
+        --itemColor: var(--text-normal) !important;
+        --itemHoverBG: var(--interactive-accent-hover) !important;
+        --itemHoverColor: var(--text-on-accent) !important;
+        --listBackground: var(--interactive-normal) !important;
     }
 </style>

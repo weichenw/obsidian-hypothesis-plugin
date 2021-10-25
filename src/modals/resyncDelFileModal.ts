@@ -4,6 +4,7 @@ import { settingsStore } from '~/store';
 import { get } from 'svelte/store';
 import SyncHypothesis from '~/sync/syncHypothesis';
 import FileManager from '~/fileManager';
+import type { SyncedFile } from '~/models';
 
 export default class ResyncDelFileModal extends Modal {
     private syncHypothesis!: SyncHypothesis;
@@ -30,15 +31,18 @@ export default class ResyncDelFileModal extends Modal {
 		this.syncHypothesis = new SyncHypothesis(fileManager);
         const deletedFiles = await this.retrieveDeletedFiles(this.vault);
 
-        this.titleEl.innerText = "Hypothes.is: Resync deleted file";
+        this.titleEl.innerText = "Hypothes.is: Resync deleted file(s)";
 
         this.modalContent = new ResyncDelFileModalContent({
             target: this.contentEl,
             props: {
                 deletedFiles: deletedFiles,
                 onSubmit: async (value: { selected }) => {
-                    console.log(`Resync ${value.selected.filename}`)
-                    this.startResync(value.selected.uri)
+                    if((!!value.selected) && value.selected.length > 0 ){
+                        this.startResync(value.selected)
+                    } else{
+                        console.log('No files selected')
+                    }
                     this.close();
                 },
             },
@@ -69,9 +73,11 @@ export default class ResyncDelFileModal extends Modal {
         return syncedFiles.filter((file) =>  !existingFiles.files.includes(file.filename));
     }
 
-    async startResync(uri: string): Promise<void> {
-		console.log('Start syncing...')
-		await this.syncHypothesis.startSync(uri);
+    async startResync(selectedFiles: SyncedFile[]): Promise<void> {
+        selectedFiles.forEach(async selected => {
+		console.log(`Start resync deleted file - ${selected.filename}`)
+		await this.syncHypothesis.startSync(selected.uri);
+        })
 	}
 }
 

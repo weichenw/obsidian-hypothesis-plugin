@@ -1,5 +1,7 @@
 import md5 from 'crypto-js/md5';
 import { moment } from 'obsidian';
+import { settingsStore } from '~/store';
+import { get } from 'svelte/store';
 
 const parseAuthorUrl = (url: string) => {
     const domain = (new URL(url));
@@ -9,6 +11,7 @@ const parseAuthorUrl = (url: string) => {
 
 
 const parseSyncResponse = async (data) => {
+        const momentFormat = get(settingsStore).dateTimeFormat;
 
         return data.reduce((result, current) => {
 
@@ -40,8 +43,8 @@ const parseSyncResponse = async (data) => {
             result[md5Hash].highlights.push(
                 {
                     id: current['id'],
-                    created: moment(current['created']).format('YYYY-MM-DD HH:mm:ss'),
-                    updated: moment(current['updated']).format('YYYY-MM-DD HH:mm:ss'),
+                    created: moment(current['created']).format(momentFormat),
+                    updated: moment(current['updated']).format(momentFormat),
                     text: selectorText,
                     incontext: current['links']['incontext'],
                     user: current['user'],

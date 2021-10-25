@@ -17,6 +17,7 @@ type Settings = {
   template: string;
   syncOnBoot: boolean;
   history: SyncHistory;
+  dateTimeFormat: string;
   syncedFiles: SyncedFile[];
 };
 
@@ -27,6 +28,7 @@ const DEFAULT_SETTINGS: Settings = {
   isConnected: false,
   template: defaultTemplate,
   syncOnBoot: false,
+  dateTimeFormat: 'YYYY-MM-DD HH:mm:ss',
   history: {
     totalArticles: 0,
     totalHighlights: 0,
@@ -132,6 +134,13 @@ const createSettingsStore = () => {
     });
   };
 
+  const setDateTimeFormat= (value: string) => {
+    store.update((state) => {
+      state.dateTimeFormat = value;
+      return state;
+    });
+  };
+
   const addSyncedFile = (value: SyncedFile) => {
     store.update((state) => {
       const uniqueValuesSet = new Set();
@@ -158,7 +167,8 @@ const createSettingsStore = () => {
       setTemplate,
       setSyncOnBoot,
       incrementHistory,
-      addSyncedFile,
+      setDateTimeFormat,
+      addSyncedFile
     },
   };
 };

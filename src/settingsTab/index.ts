@@ -1,4 +1,5 @@
 import templateInstructions from './templateInstructions.html';
+import datetimeInstructions from './datetimeInstructions.html';
 import type HypothesisPlugin from '~/main';
 import pickBy from 'lodash.pickby';
 import { App, PluginSettingTab, Setting } from 'obsidian';
@@ -36,6 +37,7 @@ export class SettingsTab extends PluginSettingTab {
 
     this.highlightsFolder();
     this.syncOnBoot();
+    this.dateFormat();
     this.template();
     this.resetSyncHistory();
   }
@@ -171,10 +173,28 @@ export class SettingsTab extends PluginSettingTab {
       });
   }
 
+  private dateFormat(): void {
+    const descFragment = document
+      .createRange()
+      .createContextualFragment(datetimeInstructions);
+
+    new Setting(this.containerEl)
+      .setName('Date & time format')
+      .setDesc(descFragment)
+      .addText((text) => {
+        text
+          .setPlaceholder('YYYY-MM-DD HH:mm:ss')
+          .setValue(get(settingsStore).dateTimeFormat)
+          .onChange(async (value) => {
+            await settingsStore.actions.setDateTimeFormat(value);
+          });
+      });
+  }
+
   private async resyncDeletedFile(): Promise<void> {
       new Setting(this.containerEl)
-      .setName('Sync deleted file')
-      .setDesc('Manually sync a deleted file')
+      .setName('Sync deleted file(s)')
+      .setDesc('Manually sync deleted file(s)')
       .addButton((button) => {
         return button
           .setButtonText('Show deleted file(s)')

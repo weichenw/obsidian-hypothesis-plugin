@@ -45,9 +45,13 @@ export default class HypothesisPlugin extends Plugin {
 
 		this.addCommand({
 			id: 'hypothesis-resync-deleted',
-			name: 'Resync deleted file',
+			name: 'Resync deleted file(s)',
 			callback: () => {
-				this.showResyncModal();
+				if (!get(settingsStore).isConnected) {
+					new Notice('Please configure Hypothesis API token in the plugin setting');
+				} else {
+					this.showResyncModal();
+				}
 			},
 		});
 
