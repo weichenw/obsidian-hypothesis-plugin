@@ -9,7 +9,6 @@
     let value;
     const optionIdentifier = 'uri';
     const labelIdentifier = 'filename';
-    console.log(deletedFiles);
     function handleSelect(event) {
         disabledButton = !selected
     }
