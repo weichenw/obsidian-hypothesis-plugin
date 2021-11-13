@@ -1,7 +1,8 @@
 import sanitize from 'sanitize-filename';
 
 export const sanitizeTitle = (title: string): string => {
-  return sanitizeTitleExcess(title).replace(/[':]/g, ''); // remove single quotes from title
+  const santizedTitle = title.replace(/[':]/g, '').trim();
+  return sanitize(santizedTitle);
 };
 
 export const sanitizeTitleExcess = (title: string): string => {
