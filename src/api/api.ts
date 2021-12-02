@@ -48,7 +48,7 @@ export default class ApiManager {
   }
 
   async getHighlights(lastSyncDate?: Date){
-        let offset = 0;
+        // let offset = 0;
         let maxResult = 1000;
         let initialQuery = true;
         let result= [];
@@ -58,7 +58,7 @@ export default class ApiManager {
         // const limit = lastSyncDate ? 200 : 100;
         const limit = 200;
 
-        for(let resultCount = 0; resultCount < maxResult && offset <= maxResult; offset+= 2){
+        for(let resultCount = 0; resultCount < maxResult;){
 
           try{
             response = await fetch(`${this.baseUrl}/search?user=${this.userid}&offset=${resultCount}&limit=${limit}&sort=updated&order=asc`+queryDate, {headers: {...this.getHeaders()}})
