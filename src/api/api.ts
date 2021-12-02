@@ -61,7 +61,7 @@ export default class ApiManager {
         for(let resultCount = 0; resultCount < maxResult && offset <= maxResult; offset+= 2){
 
           try{
-            response = await fetch(`${this.baseUrl}/search?user=${this.userid}&offset=${offset}&limit=${limit}&sort=updated&order=asc`+queryDate, {headers: {...this.getHeaders()}})
+            response = await fetch(`${this.baseUrl}/search?user=${this.userid}&offset=${resultCount}&limit=${limit}&sort=updated&order=asc`+queryDate, {headers: {...this.getHeaders()}})
           }
           catch (e) {
               new Notice('Error occurs. Please check your API token and try again.')
