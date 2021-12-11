@@ -23,11 +23,14 @@ const parseSyncResponse = async (data) => {
             const md5Hash = md5(current['uri']);
             let selectorText = 'No highlighted text';
 
-            if (!result[md5Hash]) {
-                result[md5Hash] = { id: md5Hash,  metadata: { title: current['document']['title'][0], url: current['uri'], author: parseAuthorUrl(current['uri'])},highlights: [] };
-            }
-
             try {
+
+                // Get document metadata; title
+                if (!result[md5Hash]) {
+                    result[md5Hash] = { id: md5Hash,  metadata: { title: current['document']['title'][0], url: current['uri'], author: parseAuthorUrl(current['uri'])},highlights: [] };
+                }
+
+                // Get highlighted text
                 const val = "TextQuoteSelector";
                 const selector = current['target'][0]['selector']
                 selector.find(function(item, i) {
@@ -36,22 +39,24 @@ const parseSyncResponse = async (data) => {
                         return i;
                     }
                 });
+
+                result[md5Hash].highlights.push(
+                    {
+                        id: current['id'],
+                        created: moment(current['created']).format(momentFormat),
+                        updated: moment(current['updated']).format(momentFormat),
+                        text: selectorText,
+                        incontext: current['links']['incontext'],
+                        user: current['user'],
+                        annotation: current['text'],
+                        tags: current['tags'],
+                    }
+                );
+
             } catch (error) {
-                // console.log(`no highlights found possible only annotations, {$current}`);
+                console.log(`Possible missing highlights or document title. ${error}`,current);
             }
 
-            result[md5Hash].highlights.push(
-                {
-                    id: current['id'],
-                    created: moment(current['created']).format(momentFormat),
-                    updated: moment(current['updated']).format(momentFormat),
-                    text: selectorText,
-                    incontext: current['links']['incontext'],
-                    user: current['user'],
-                    annotation: current['text'],
-                    tags: current['tags'],
-                }
-            );
             return result;
         }, {});
 
