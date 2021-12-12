@@ -20,6 +20,7 @@ export type Highlights = {
   user: string;
   annotation: string;
   tags: string[];
+  group: string;
 };
 
 export type RenderTemplate = {
@@ -35,7 +36,15 @@ export type RenderTemplate = {
     user?: string;
     annotation: string;
     tags: string[];
+    group: string;
   }[];
+};
+
+export type Group = {
+  id: string;
+  name: string;
+  type: string;
+  public: boolean;
 };
 
 export type SyncedFile = {

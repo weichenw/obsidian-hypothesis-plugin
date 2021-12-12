@@ -1,6 +1,6 @@
-import { settingsStore , syncSessionStore} from '~/store';
+import { settingsStore, syncSessionStore } from '~/store';
 import type { SyncState } from './syncState';
-import {get} from 'svelte/store';
+import { get } from 'svelte/store';
 import ApiManager from '~/api/api';
 import parseSyncResponse from '~/parser/parseSyncResponse';
 import type FileManager from '~/fileManager';
@@ -21,12 +21,14 @@ export default class SyncHypothesis {
         const token = await get(settingsStore).token;
         const userid = await get(settingsStore).user;
 
-        const apiManager = new ApiManager(token,userid);
+        const apiManager = new ApiManager(token, userid);
 
         syncSessionStore.actions.startSync();
 
-        const responseBody: [] = (!uri) ?  await apiManager.getHighlights(get(settingsStore).lastSyncDate): await apiManager.getHighlightWithUri(uri);
-        const syncedArticles: [] = await parseSyncResponse(responseBody);
+        const responseGroup: [] = await apiManager.getGroups();
+        console.log(responseGroup);
+        const responseBody: [] = (!uri) ? await apiManager.getHighlights(get(settingsStore).lastSyncDate) : await apiManager.getHighlightWithUri(uri);
+        const syncedArticles: [] = await parseSyncResponse(responseBody, responseGroup);
 
         syncSessionStore.actions.setJobs(syncedArticles);
 
@@ -63,10 +65,10 @@ export default class SyncHypothesis {
 
         const createdNewArticle = await this.fileManager.createOrUpdate(article);
 
-        if(createdNewArticle){
+        if (createdNewArticle) {
             this.syncState.newArticlesSynced += 1;
         }
         this.syncState.newHighlightsSynced += article.highlights.length;
 
-  }
+    }
 }
