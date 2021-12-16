@@ -1,4 +1,4 @@
-import type { SyncedFile } from '~/models';
+import type { Group, SyncedFile } from '~/models';
 import { writable } from 'svelte/store';
 import defaultTemplate from '~/assets/defaultTemplate.njk';
 import type HypothesisPlugin from '~/main';
@@ -19,6 +19,7 @@ type Settings = {
   history: SyncHistory;
   dateTimeFormat: string;
   syncedFiles: SyncedFile[];
+  groups: Group[];
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -33,7 +34,8 @@ const DEFAULT_SETTINGS: Settings = {
     totalArticles: 0,
     totalHighlights: 0,
   },
-  syncedFiles:[]
+  syncedFiles: [],
+  groups: []
 };
 
 const createSettingsStore = () => {
@@ -84,6 +86,7 @@ const createSettingsStore = () => {
       state.isConnected = false;
       state.user = undefined;
       state.token = undefined;
+      state.groups = [];
       return state;
     });
   };
@@ -134,7 +137,7 @@ const createSettingsStore = () => {
     });
   };
 
-  const setDateTimeFormat= (value: string) => {
+  const setDateTimeFormat = (value: string) => {
     store.update((state) => {
       state.dateTimeFormat = value;
       return state;
@@ -155,6 +158,20 @@ const createSettingsStore = () => {
     });
   }
 
+  const setGroups = async (value: Group[]) => {
+    store.update((state) => {
+      state.groups = value;
+      return state;
+    });
+  };
+
+  const resetGroups = async () => {
+    store.update((state) => {
+      state.groups = [];
+      return state;
+    });
+  };
+
   return {
     subscribe: store.subscribe,
     initialise,
@@ -168,7 +185,9 @@ const createSettingsStore = () => {
       setSyncOnBoot,
       incrementHistory,
       setDateTimeFormat,
-      addSyncedFile
+      addSyncedFile,
+      setGroups,
+      resetGroups
     },
   };
 };

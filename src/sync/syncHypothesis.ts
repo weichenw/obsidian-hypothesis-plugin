@@ -1,18 +1,21 @@
-import { settingsStore , syncSessionStore} from '~/store';
+import { settingsStore, syncSessionStore } from '~/store';
 import type { SyncState } from './syncState';
-import {get} from 'svelte/store';
+import { get } from 'svelte/store';
 import ApiManager from '~/api/api';
 import parseSyncResponse from '~/parser/parseSyncResponse';
+import SyncGroup from './syncGroup';
 import type FileManager from '~/fileManager';
 import type { Article } from '~/models';
 
 export default class SyncHypothesis {
 
     private syncState: SyncState = { newArticlesSynced: 0, newHighlightsSynced: 0 };
+    private syncGroup: SyncGroup;
     private fileManager: FileManager;
 
     constructor(fileManager: FileManager) {
         this.fileManager = fileManager;
+        this.syncGroup = new SyncGroup;
     }
 
     async startSync(uri?: string) {
@@ -21,11 +24,15 @@ export default class SyncHypothesis {
         const token = await get(settingsStore).token;
         const userid = await get(settingsStore).user;
 
-        const apiManager = new ApiManager(token,userid);
+        const apiManager = new ApiManager(token, userid);
 
         syncSessionStore.actions.startSync();
 
-        const responseBody: [] = (!uri) ?  await apiManager.getHighlights(get(settingsStore).lastSyncDate): await apiManager.getHighlightWithUri(uri);
+        //fetch groups
+        await this.syncGroup.startSync();
+
+        //fetch highlights
+        const responseBody: [] = (!uri) ? await apiManager.getHighlights(get(settingsStore).lastSyncDate) : await apiManager.getHighlightWithUri(uri);
         const syncedArticles: [] = await parseSyncResponse(responseBody);
 
         syncSessionStore.actions.setJobs(syncedArticles);
@@ -63,10 +70,10 @@ export default class SyncHypothesis {
 
         const createdNewArticle = await this.fileManager.createOrUpdate(article);
 
-        if(createdNewArticle){
+        if (createdNewArticle) {
             this.syncState.newArticlesSynced += 1;
         }
         this.syncState.newHighlightsSynced += article.highlights.length;
 
-  }
+    }
 }

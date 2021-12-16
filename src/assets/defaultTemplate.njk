@@ -7,6 +7,6 @@
 - Category: #article{% endif %}
 
 {% if is_new_article -%}## Highlights{%- endif %}
-{% for highlight in highlights -%}- {{highlight.text}} — [Updated on {{highlight.updated}}]({{highlight.incontext}})
-{% if highlight.tags | length %}   - Tags: {% for tag in highlight.tags -%}#{{tag| replace(" ", "-")}} {%- endfor %}{%- endif %}
+{% for highlight in highlights -%}- {{highlight.text}} — [Updated on {{highlight.updated}}]({{highlight.incontext}}) {% if 'Private' != highlight.group %} — Group: #{{highlight.group| replace(" ", "-")}}{%- endif %}
+{% if highlight.tags | length %}   - Tags: {% for tag in highlight.tags -%} #{{tag | replace(" ", "-")+" "}}{%- endfor %}{%- endif %}
 {% if highlight.annotation %}   - Annotation: {{highlight.annotation}}{%- endif -%}{%- endfor -%}

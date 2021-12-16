@@ -9,6 +9,8 @@ import { settingsStore } from '~/store';
 import { TokenManager } from '~/store/tokenManager';
 import ApiTokenModal from '~/modals/apiTokenModal';
 import ResyncDelFileModal from '~/modals/resyncDelFileModal';
+import SyncGroup from '~/sync/syncGroup';
+import ManageGroupsModal from '~/modals/manageGroupsModal';
 
 const { moment } = window;
 
@@ -16,12 +18,14 @@ export class SettingsTab extends PluginSettingTab {
   public app: App;
   private renderer: Renderer;
   private tokenManager: TokenManager;
+  private syncGroup: SyncGroup;
 
   constructor(app: App, plugin: HypothesisPlugin) {
     super(app, plugin);
     this.app = app;
     this.renderer = new Renderer();
     this.tokenManager = new TokenManager();
+    this.syncGroup = new SyncGroup();
   }
 
   public async display(): Promise<void> {
@@ -39,6 +43,7 @@ export class SettingsTab extends PluginSettingTab {
     this.syncOnBoot();
     this.dateFormat();
     this.template();
+    this.manageGroups();
     this.resetSyncHistory();
   }
 
@@ -73,7 +78,7 @@ export class SettingsTab extends PluginSettingTab {
   }
 
   private connect(): void {
-      new Setting(this.containerEl)
+    new Setting(this.containerEl)
       .setName('Connect to Hypothes.is')
       .addButton((button) => {
         return button
@@ -165,6 +170,7 @@ export class SettingsTab extends PluginSettingTab {
       .addButton((button) => {
         return button
           .setButtonText('Reset')
+          .setDisabled(!get(settingsStore).isConnected)
           .setWarning()
           .onClick(async () => {
             await settingsStore.actions.resetSyncHistory();
@@ -192,7 +198,7 @@ export class SettingsTab extends PluginSettingTab {
   }
 
   private async resyncDeletedFile(): Promise<void> {
-      new Setting(this.containerEl)
+    new Setting(this.containerEl)
       .setName('Sync deleted file(s)')
       .setDesc('Manually sync deleted file(s)')
       .addButton((button) => {
@@ -211,6 +217,36 @@ export class SettingsTab extends PluginSettingTab {
             this.display(); // rerender
           });
       });
-   }
+  }
 
+  private async manageGroups(): Promise<void> {
+    const descFragment = document.createRange().createContextualFragment(`Add/remove group(s) to be synced.<br/>
+      ${(get(settingsStore).groups).length} group(s) synced from Hypothesis<br/>`);
+
+    new Setting(this.containerEl)
+      .setName('Groups')
+      .setDesc(descFragment)
+      .addExtraButton((button) => {
+        return button
+          .setIcon('switch')
+          .setTooltip('Reset group selections')
+          .setDisabled(!get(settingsStore).isConnected)
+          .onClick(async () => {
+            await settingsStore.actions.resetGroups();
+            await this.syncGroup.startSync();
+            this.display(); // rerender
+          });
+      })
+      .addButton((button) => {
+        return button
+          .setButtonText('Manage')
+          .setCta()
+          .setDisabled(!get(settingsStore).isConnected)
+          .onClick(async () => {
+            const manageGroupsModal = new ManageGroupsModal(this.app);
+            await manageGroupsModal.waitForClose;
+            this.display(); // rerender
+          });
+      });
+  }
 }
