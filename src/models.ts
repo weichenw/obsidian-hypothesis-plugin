@@ -45,6 +45,7 @@ export type Group = {
   name: string;
   type: string;
   public: boolean;
+  selected: boolean;
 };
 
 export type SyncedFile = {

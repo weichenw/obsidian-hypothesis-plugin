@@ -10,13 +10,20 @@ const parseAuthorUrl = (url: string) => {
 }
 
 
-const parseSyncResponse = async (data, groups) => {
+const parseSyncResponse = async (data) => {
     const momentFormat = get(settingsStore).dateTimeFormat;
+    const groups = get(settingsStore).groups;
 
     return data.reduce((result, current) => {
 
         //skip pdf source
         if ((current['uri']).startsWith('urn:x-pdf')) {
+            return result;
+        }
+
+        //Check if group is selected
+        const group = groups.find(k => k.id == current['group']);
+        if (!group.selected) {
             return result;
         }
 
@@ -39,9 +46,6 @@ const parseSyncResponse = async (data, groups) => {
                     return i;
                 }
             });
-
-            //Get group name
-            const group = groups.find(k => k.id == current['group']);
 
             result[md5Hash].highlights.push(
                 {

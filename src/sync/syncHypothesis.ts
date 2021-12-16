@@ -3,16 +3,19 @@ import type { SyncState } from './syncState';
 import { get } from 'svelte/store';
 import ApiManager from '~/api/api';
 import parseSyncResponse from '~/parser/parseSyncResponse';
+import SyncGroup from './syncGroup';
 import type FileManager from '~/fileManager';
 import type { Article } from '~/models';
 
 export default class SyncHypothesis {
 
     private syncState: SyncState = { newArticlesSynced: 0, newHighlightsSynced: 0 };
+    private syncGroup: SyncGroup;
     private fileManager: FileManager;
 
     constructor(fileManager: FileManager) {
         this.fileManager = fileManager;
+        this.syncGroup = new SyncGroup;
     }
 
     async startSync(uri?: string) {
@@ -25,10 +28,12 @@ export default class SyncHypothesis {
 
         syncSessionStore.actions.startSync();
 
-        const responseGroup: [] = await apiManager.getGroups();
-        console.log(responseGroup);
+        //fetch groups
+        await this.syncGroup.startSync();
+
+        //fetch highlights
         const responseBody: [] = (!uri) ? await apiManager.getHighlights(get(settingsStore).lastSyncDate) : await apiManager.getHighlightWithUri(uri);
-        const syncedArticles: [] = await parseSyncResponse(responseBody, responseGroup);
+        const syncedArticles: [] = await parseSyncResponse(responseBody);
 
         syncSessionStore.actions.setJobs(syncedArticles);
 

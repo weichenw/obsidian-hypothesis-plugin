@@ -23,6 +23,7 @@ Use Hypothesis icon on the side icon ribbon or command to trigger manual sync.
 - `Highlights folder`: Specify the folder location for your Hypothesis articles
 - `Sync on startup`: Automatically sync highlights when open Obsidian
 - `Highlights template`: Nunjuck template for rendering your highlights
+- `Groups`: Add/remove group to be synced
 - `Reset sync`: Wipe your sync history. Does not delete any previously synced highlights from your vault
 
 ### To sync all new highlights since previous update
