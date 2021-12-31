@@ -11,7 +11,7 @@ addIcon('hypothesisIcon', hypothesisIcon);
 
 export default class HypothesisPlugin extends Plugin {
 	private syncHypothesis!: SyncHypothesis;
-	private timeoutIDPull: number;
+	private timeoutIDAutoSync: number;
 
 	async onload(): Promise<void> {
 		console.log('loading plugin', new Date().toLocaleString());
@@ -87,18 +87,17 @@ export default class HypothesisPlugin extends Plugin {
 	}
 
 	async clearAutoSync(): Promise<void> {
-		if (this.timeoutIDPull) {
-            window.clearTimeout(this.timeoutIDPull);
-            this.timeoutIDPull = undefined;
+		if (this.timeoutIDAutoSync) {
+            window.clearTimeout(this.timeoutIDAutoSync);
+            this.timeoutIDAutoSync = undefined;
         }
 		console.log('Clearing auto sync...');
 	}
 
 	async startAutoSync(minutes?: number): Promise<void> {
 		const minutesToSync = minutes ?? Number(get(settingsStore).autoSyncInterval);
-		console.log(`now start with ${minutesToSync}`);
 		if (minutesToSync > 0) {
-			this.timeoutIDPull = window.setTimeout(
+			this.timeoutIDAutoSync = window.setTimeout(
 				() => {
 					this.startSync();
 					this.startAutoSync();
@@ -106,6 +105,6 @@ export default class HypothesisPlugin extends Plugin {
 				minutesToSync * 60000
 			);
 		}
-		console.log(`StartAutoSync: this.timeoutIDPull ${this.timeoutIDPull} with ${minutesToSync} minutes`);
+		console.log(`StartAutoSync: this.timeoutIDAutoSync ${this.timeoutIDAutoSync} with ${minutesToSync} minutes`);
 	}
 }
