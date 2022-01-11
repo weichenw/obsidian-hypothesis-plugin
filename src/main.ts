@@ -11,6 +11,7 @@ addIcon('hypothesisIcon', hypothesisIcon);
 
 export default class HypothesisPlugin extends Plugin {
 	private syncHypothesis!: SyncHypothesis;
+	private timeoutIDAutoSync: number;
 
 	async onload(): Promise<void> {
 		console.log('loading plugin', new Date().toLocaleString());
@@ -64,6 +65,10 @@ export default class HypothesisPlugin extends Plugin {
 				console.info('Sync disabled. API Token not configured');
 			}
 		}
+
+		if (get(settingsStore).autoSyncInterval) {
+			this.startAutoSync();
+		}
 	}
 
 	async showResyncModal(): Promise<void> {
@@ -73,10 +78,33 @@ export default class HypothesisPlugin extends Plugin {
 
 	async onunload() : Promise<void> {
 		console.log('unloading plugin', new Date().toLocaleString());
+		this.clearAutoSync();
 	}
 
 	async startSync(): Promise<void> {
 		console.log('Start syncing...')
 		await this.syncHypothesis.startSync();
+	}
+
+	async clearAutoSync(): Promise<void> {
+		if (this.timeoutIDAutoSync) {
+            window.clearTimeout(this.timeoutIDAutoSync);
+            this.timeoutIDAutoSync = undefined;
+        }
+		console.log('Clearing auto sync...');
+	}
+
+	async startAutoSync(minutes?: number): Promise<void> {
+		const minutesToSync = minutes ?? Number(get(settingsStore).autoSyncInterval);
+		if (minutesToSync > 0) {
+			this.timeoutIDAutoSync = window.setTimeout(
+				() => {
+					this.startSync();
+					this.startAutoSync();
+				},
+				minutesToSync * 60000
+			);
+		}
+		console.log(`StartAutoSync: this.timeoutIDAutoSync ${this.timeoutIDAutoSync} with ${minutesToSync} minutes`);
 	}
 }

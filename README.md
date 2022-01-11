@@ -20,6 +20,7 @@ Use Hypothesis icon on the side icon ribbon or command to trigger manual sync.
 
 - `Connect`: Enter [API Token](https://hypothes.is/account/developer) in order to pull the highlights from Hypohesis
 - `Disconnect`: Remove API Token from Obsidian
+- `Auto Sync Interval`: Set the interval in minutes to sync Hypothesis highlights automatically
 - `Highlights folder`: Specify the folder location for your Hypothesis articles
 - `Sync on startup`: Automatically sync highlights when open Obsidian
 - `Highlights template`: Nunjuck template for rendering your highlights

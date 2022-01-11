@@ -16,6 +16,7 @@ const { moment } = window;
 
 export class SettingsTab extends PluginSettingTab {
   public app: App;
+  private plugin: HypothesisPlugin;
   private renderer: Renderer;
   private tokenManager: TokenManager;
   private syncGroup: SyncGroup;
@@ -23,6 +24,7 @@ export class SettingsTab extends PluginSettingTab {
   constructor(app: App, plugin: HypothesisPlugin) {
     super(app, plugin);
     this.app = app;
+    this.plugin = plugin;
     this.renderer = new Renderer();
     this.tokenManager = new TokenManager();
     this.syncGroup = new SyncGroup();
@@ -38,7 +40,7 @@ export class SettingsTab extends PluginSettingTab {
     } else {
       this.connect();
     }
-
+    this.autoSyncInterval();
     this.highlightsFolder();
     this.syncOnBoot();
     this.dateFormat();
@@ -96,6 +98,34 @@ export class SettingsTab extends PluginSettingTab {
             this.display(); // rerender
           });
       });
+  }
+
+  private autoSyncInterval(): void {
+    new Setting(this.containerEl)
+    .setName('Auto sync in interval (minutes)')
+    .setDesc('Sync every X minutes. To disable auto sync, specify negative value or zero (default)')
+    .addText((text) => {
+      text
+        .setPlaceholder(String(0))
+        .setValue(String(get(settingsStore).autoSyncInterval))
+        .onChange(async (value) => {
+          if (!isNaN(Number(value))) {
+            const minutes = Number(value);
+            await settingsStore.actions.setAutoSyncInterval(minutes);
+            const autoSyncInterval = get(settingsStore).autoSyncInterval;
+            console.log(autoSyncInterval);
+            if (autoSyncInterval > 0) {
+              this.plugin.clearAutoSync();
+              this.plugin.startAutoSync(minutes);
+              console.log(
+                  `Auto sync enabled! Every ${minutes} minutes.`
+              );
+            } else if (autoSyncInterval <= 0) {
+              this.plugin.clearAutoSync() && console.log("Auto sync disabled!");
+            }
+          }
+        });
+    });
   }
 
   private highlightsFolder(): void {

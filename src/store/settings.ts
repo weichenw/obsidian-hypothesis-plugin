@@ -18,6 +18,7 @@ type Settings = {
   syncOnBoot: boolean;
   history: SyncHistory;
   dateTimeFormat: string;
+  autoSyncInterval: number;
   syncedFiles: SyncedFile[];
   groups: Group[];
 };
@@ -29,6 +30,7 @@ const DEFAULT_SETTINGS: Settings = {
   isConnected: false,
   template: defaultTemplate,
   syncOnBoot: false,
+  autoSyncInterval: 0,
   dateTimeFormat: 'YYYY-MM-DD HH:mm:ss',
   history: {
     totalArticles: 0,
@@ -144,6 +146,13 @@ const createSettingsStore = () => {
     });
   };
 
+  const setAutoSyncInterval = (value: number) => {
+    store.update((state) => {
+      state.autoSyncInterval = value;
+      return state;
+    });
+  };
+
   const addSyncedFile = (value: SyncedFile) => {
     store.update((state) => {
       const uniqueValuesSet = new Set();
@@ -181,6 +190,7 @@ const createSettingsStore = () => {
       setSyncDateToNow,
       connect,
       disconnect,
+      setAutoSyncInterval,
       setTemplate,
       setSyncOnBoot,
       incrementHistory,
