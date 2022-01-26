@@ -38,7 +38,7 @@ Use Hypothesis icon on the side icon ribbon or command to trigger manual sync.
 
 - Limit to 1000 highlights on initial sync for performance. Subsequent sync for deltas are capped at 200 as pagination of result sets does not work in conjunction with API search_after parameter.
 - Only tested with Obsidian Mac OSX and Windows 10.
-- Have not tested to sync annotations on PDFs.
+- Does not suport annotations on PDFs.
 
 ## Acknowledgement
 
