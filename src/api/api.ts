@@ -112,7 +112,7 @@ export default class ApiManager {
     const limit = 200;
 
     try {
-      response = await fetch(`${this.baseUrl}/search?user=${this.userid}&limit=${limit}&uri=${uri}`, { headers: { ...this.getHeaders() } })
+      response = await fetch(`${this.baseUrl}/search?user=${this.userid}&limit=${limit}&uri=${uri}&sort=updated&order=asc`, { headers: { ...this.getHeaders() } })
     }
     catch (e) {
       new Notice('Error occurs. Please check your API token and try again.')
