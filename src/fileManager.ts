@@ -67,15 +67,15 @@ export default class FileManager {
         return { file, frontmatter: cache?.frontmatter };
       })
       .filter(({ frontmatter }) => frontmatter?.["doc_type"] === frontMatterDocType)
-      .map(({ file, frontmatter }): AnnotationFile => ({file, articleUrl: frontmatter["url"]}))
+      .map(({ file, frontmatter }): AnnotationFile => ({ file, articleUrl: frontmatter["url"] }))
   }
 
   public getNewArticleFilePath(article: Article): string {
     const settings = get(settingsStore);
-    let folderPath = settings.highlightsFolder;
+    const folderPath = settings.highlightsFolder;
 
     const fileName = `${sanitizeTitle(article.metadata.title)}.md`;
-    const filePath = `${folderPath}/${fileName}`  
+    const filePath = `${folderPath}/${fileName}`
     return filePath;
   }
 

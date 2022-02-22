@@ -20,6 +20,7 @@ type Settings = {
   dateTimeFormat: string;
   autoSyncInterval: number;
   groups: Group[];
+  useDomainFolders: boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -164,6 +165,13 @@ const createSettingsStore = () => {
     });
   };
 
+  const setUseDomainFolder = (value: boolean) => {
+    store.update((state) => {
+      state.useDomainFolders = value;
+      return state;
+    });
+  };
+
   return {
     subscribe: store.subscribe,
     initialise,
@@ -179,7 +187,8 @@ const createSettingsStore = () => {
       incrementHistory,
       setDateTimeFormat,
       setGroups,
-      resetGroups
+      resetGroups,
+      setUseDomainFolder,
     },
   };
 };
