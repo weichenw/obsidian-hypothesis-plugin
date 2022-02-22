@@ -8,7 +8,10 @@
     "paths": {
       "src": ["src/*", "tests/*"],
       "~/*": ["src/*"]
-    }
+    },
+    "lib": [
+      "es2021"
+    ]
   },
   "esModuleInterop": true
 }

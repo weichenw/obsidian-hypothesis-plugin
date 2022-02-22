@@ -6,6 +6,13 @@
 {% if url %}- Reference: {{url}}{% endif %}
 - Category: #article{% endif %}
 
+{% if is_new_article%}## Page Notes
+{% for highlight in page_notes -%}
+{{highlight.annotation}}
+{% if highlight.tags | length %} Tags: {% for tag in highlight.tags -%} #{{tag | replace(" ", "-")+" "}}{%- endfor %}{%- endif %}
+{%- endfor -%}
+{% endif %}
+
 {% if is_new_article -%}## Highlights{%- endif %}
 {% for highlight in highlights -%}- {{highlight.text}} — [Updated on {{highlight.updated}}]({{highlight.incontext}}) {% if 'Private' != highlight.group %} — Group: #{{highlight.group| replace(" ", "-")}}{%- endif %}
 {% if highlight.tags | length %}   - Tags: {% for tag in highlight.tags -%} #{{tag | replace(" ", "-")+" "}}{%- endfor %}{%- endif %}
