@@ -38,9 +38,7 @@ const parseHighlight = (annotationData, momentFormat: string): Highlights => {
                 isReply = true
             }
          }
-
-        const excludedTags = ["via-lindylearn.io", "via annotations.lindylearn.io", "lindylearn"];
-    
+  
         return {
             id: annotationData['id'],
             created: moment(annotationData['created']).format(momentFormat),
@@ -49,7 +47,7 @@ const parseHighlight = (annotationData, momentFormat: string): Highlights => {
             incontext: annotationData['links']['incontext'],
             user: annotationData['user'],
             annotation: annotationData['text'],
-            tags: annotationData['tags'].filter(tag => !excludedTags.includes(tag)),
+            tags: annotationData['tags'],
             group: annotationData.name,
             isReply,
         }
