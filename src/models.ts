@@ -2,6 +2,7 @@ export type Article = {
   id: string;
   metadata: Metadata;
   highlights: Highlights[];
+  page_notes: Highlights[];
 };
 
 export type Metadata = {
@@ -21,6 +22,7 @@ export type Highlights = {
   annotation: string;
   tags: string[];
   group: string;
+  isReply: boolean;
 };
 
 export type RenderTemplate = {
@@ -28,16 +30,8 @@ export type RenderTemplate = {
   title: string;
   author: string;
   url: string;
-  highlights: {
-    text: string;
-    incontext?: string;
-    created?: string;
-    updated?: string;
-    user?: string;
-    annotation: string;
-    tags: string[];
-    group: string;
-  }[];
+  highlights: Highlights[];
+  page_notes: Highlights[];
 };
 
 export type Group = {

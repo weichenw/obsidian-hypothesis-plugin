@@ -2,6 +2,7 @@ import md5 from 'crypto-js/md5';
 import { moment } from 'obsidian';
 import { settingsStore } from '~/store';
 import { get } from 'svelte/store';
+import type { Article, Highlights } from '../models'
 
 const parseAuthorUrl = (url: string) => {
     const domain = (new URL(url));
@@ -9,65 +10,95 @@ const parseAuthorUrl = (url: string) => {
     return author;
 }
 
+const parseTitleFromUrl = (url: string) => {
+    const domain = (new URL(url));
+    let pathname = domain.pathname
 
-const parseSyncResponse = async (data) => {
+    // Remove leading and optional trailing slash
+    pathname = pathname.slice(1)
+    if (pathname.endsWith("/")) {
+        pathname = pathname.slice(0, pathname.length - 1)
+    }
+        
+    return pathname.replaceAll('/', '-');
+}
+
+const parseHighlight = (annotationData, momentFormat: string): Highlights => {
+    try {   
+        // Get highlighted text or reply
+        let isReply, highlightText = null;
+        const selector = annotationData['target'][0]['selector']
+        if (selector) {
+            highlightText = selector
+                .find(item => item.type === "TextQuoteSelector")
+                ?.exact
+        } else {
+            // Could be page note or reply
+            if (annotationData['references']) {
+                isReply = true
+            }
+         }
+
+        const excludedTags = ["via-lindylearn.io", "via annotations.lindylearn.io", "lindylearn"];
+    
+        return {
+            id: annotationData['id'],
+            created: moment(annotationData['created']).format(momentFormat),
+            updated: moment(annotationData['updated']).format(momentFormat),
+            text: highlightText,
+            incontext: annotationData['links']['incontext'],
+            user: annotationData['user'],
+            annotation: annotationData['text'],
+            tags: annotationData['tags'].filter(tag => !excludedTags.includes(tag)),
+            group: annotationData.name,
+            isReply,
+        }
+    } catch (error) {
+
+        console.log(`Error parsing annotation format: ${error}`, annotationData);
+        return null
+    }
+}
+
+
+const parseSyncResponse = (data): Article[] => {
     const momentFormat = get(settingsStore).dateTimeFormat;
     const groups = get(settingsStore).groups;
 
-    return data.reduce((result, current) => {
+    // Group annotations per article
+    const articlesMap = data.reduce((result, annotationData) => {
+        const url = annotationData['uri'];
+        const md5Hash = md5(url);
 
-        //skip pdf source
-        if ((current['uri']).startsWith('urn:x-pdf')) {
+        // Skip pdf source
+        if ((url).startsWith('urn:x-pdf')) {
             return result;
         }
 
-        //Check if group is selected
-        const group = groups.find(k => k.id == current['group']);
+        // Check if group is selected
+        const group = groups.find(k => k.id == annotationData['group']);
         if (!group.selected) {
             return result;
         }
-
-        const md5Hash = md5(current['uri']);
-        let selectorText = 'No highlighted text';
-
-        try {
-
-            // Get document metadata; title
-            if (!result[md5Hash]) {
-                result[md5Hash] = { id: md5Hash, metadata: { title: current['document']['title'][0], url: current['uri'], author: parseAuthorUrl(current['uri']) }, highlights: [] };
-            }
-
-            // Get highlighted text
-            const val = "TextQuoteSelector";
-            const selector = current['target'][0]['selector']
-            selector.find(function (item, i) {
-                if (item.type === val) {
-                    selectorText = item.exact;
-                    return i;
-                }
-            });
-
-            result[md5Hash].highlights.push(
-                {
-                    id: current['id'],
-                    created: moment(current['created']).format(momentFormat),
-                    updated: moment(current['updated']).format(momentFormat),
-                    text: selectorText,
-                    incontext: current['links']['incontext'],
-                    user: current['user'],
-                    annotation: current['text'],
-                    tags: current['tags'],
-                    group: group.name,
-                }
-            );
-
-        } catch (error) {
-            console.log(`Possible missing highlights or document title. ${error}`, current);
+       
+        const title = annotationData['document']['title']?.[0] || parseTitleFromUrl(url);
+        const author = parseAuthorUrl(url);
+        // Set article metadata, if not already set by previous annotation
+        if (!result[md5Hash]) {
+            result[md5Hash] = { id: md5Hash, metadata: { title, url, author }, highlights: [], page_notes: [] };
         }
 
+        const annotation = parseHighlight(annotationData, momentFormat)
+        if (!annotation.text && !annotation.isReply) {
+            result[md5Hash].page_notes.push(annotation);
+        } else {
+            result[md5Hash].highlights.push(annotation);
+        }
+        
         return result;
     }, {});
 
+    return Object.values(articlesMap)
 }
 
 export default parseSyncResponse;
