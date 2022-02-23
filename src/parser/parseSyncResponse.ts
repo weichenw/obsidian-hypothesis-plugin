@@ -9,6 +9,20 @@ const parseAuthorUrl = (url: string) => {
     return author;
 }
 
+// Strip excessive whitespace and newlines from the TextQuoteSelector highlight text
+// This mirrors how Hypothesis displays annotations, to remove artifacts from the HTML annotation anchoring
+export const cleanTextSelectorHighlight = (text: string): string => {
+    text = text.replaceAll('\n', ' ') // e.g. http://www.paulgraham.com/venturecapital.html
+    text = text.replace('\t', ' ') // e.g. https://sive.rs/about
+
+    // Remove space-indented lines, e.g. https://calpaterson.com/bank-python.html
+    while (text.contains('  ')) {
+        text = text.replaceAll('  ', ' ')
+    }
+
+    return text
+};
+
 
 const parseSyncResponse = async (data) => {
     const momentFormat = get(settingsStore).dateTimeFormat;
@@ -52,7 +66,7 @@ const parseSyncResponse = async (data) => {
                     id: current['id'],
                     created: moment(current['created']).format(momentFormat),
                     updated: moment(current['updated']).format(momentFormat),
-                    text: selectorText,
+                    text: selectorText && cleanTextSelectorHighlight(selectorText),
                     incontext: current['links']['incontext'],
                     user: current['user'],
                     annotation: current['text'],
