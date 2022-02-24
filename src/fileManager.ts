@@ -1,53 +1,81 @@
-import type {  Vault } from 'obsidian';
+import type { Vault, MetadataCache, TFile } from 'obsidian';
 import { get } from 'svelte/store';
 import { Renderer } from '~/renderer';
 import { settingsStore } from '~/store';
 import { sanitizeTitle } from '~/utils/sanitizeTitle';
 import type { Article } from '~/models';
+import { frontMatterDocType, addFrontMatter } from "~/utils/frontmatter"
 
-const articleFilePath = (fileName: string): string => {
-  // const fileName = sanitizeTitle(articleTitle);
-  return `${get(settingsStore).highlightsFolder}/${fileName}.md`;
+type AnnotationFile = {
+  articleUrl?: string;
+  file: TFile;
 };
 
 export default class FileManager {
   private vault: Vault;
+  private metadataCache: MetadataCache;
   private renderer: Renderer;
 
-  constructor(vault: Vault) {
+  constructor(vault: Vault, metadataCache: MetadataCache) {
     this.vault = vault;
+    this.metadataCache = metadataCache;
     this.renderer = new Renderer();
   }
 
-  public async createFile(filePath: string, article: Article, content: string): Promise<void> {
+  // Save an article as markdown file, replacing its existing file if present
+  public async saveArticle(article: Article): Promise<boolean> {
+    const existingFile = await this.getArticleFile(article);
 
-    await this.vault.create(filePath, content);
+    if (existingFile) {
+      console.debug(`Updating ${existingFile.path}`);
+
+      const newMarkdownContent = this.renderer.render(article, false);
+      const existingFileContent = await this.vault.cachedRead(existingFile);
+      const fileContent = existingFileContent + newMarkdownContent;
+
+      await this.vault.modify(existingFile, fileContent);
+      return false;
+    } else {
+      const newFilePath = await this.getNewArticleFilePath(article);
+      console.debug(`Creating ${newFilePath}`);
+
+      const markdownContent = this.renderer.render(article, true);
+      const fileContent = addFrontMatter(markdownContent, article);
+
+      await this.vault.create(newFilePath, fileContent);
+      return true;
+    }
   }
 
-  public async createOrUpdate(article: Article): Promise<boolean> {
-    const fileName = sanitizeTitle(article.metadata.title);
-    const filePath = articleFilePath(fileName);
-    let createdNewArticle = false;
+  private async getArticleFile(article: Article): Promise<TFile | null> {
+    const files = await this.getAnnotationFiles()
+    return files.find((file) => file.articleUrl === article.metadata.url)?.file || null;
+  }
 
-    if (!(await this.vault.adapter.exists(filePath))) {
+  // TODO cache this method for performance?
+  private async getAnnotationFiles(): Promise<AnnotationFile[]> {
+    const files = this.vault.getMarkdownFiles();
 
-      console.info(`Document ${filePath} not found. Will be created`);
-      const content = this.renderer.render(article);
-      await this.createFile(filePath,article, content);
-      createdNewArticle = true;
-      await settingsStore.actions.addSyncedFile({filename: `${fileName}.md`, uri: encodeURIComponent(article.metadata.url)});
+    return files
+      .map((file) => {
+        const cache = this.metadataCache.getFileCache(file);
+        return { file, frontmatter: cache?.frontmatter };
+      })
+      .filter(({ frontmatter }) => frontmatter?.["doc_type"] === frontMatterDocType)
+      .map(({ file, frontmatter }): AnnotationFile => ({file, articleUrl: frontmatter["url"]}))
+  }
+
+  private async getNewArticleFilePath(article: Article): Promise<string> {
+    const settings = get(settingsStore);
+    let folderPath = settings.highlightsFolder;
+
+    if (!(await this.vault.adapter.exists(folderPath))) {
+      await this.vault.createFolder(folderPath);
     }
-    else {
 
-      console.info(`Document ${article.metadata.title} found. Loading content and updating highlights`);
-      const content = this.renderer.render(article, false);
-      const fileContent = await this.vault.adapter.read(filePath);
-      const contentToSave = fileContent + content;
-      await this.vault.adapter.write(filePath, contentToSave);
-
-    }
-
-    return createdNewArticle;
+    const fileName = `${sanitizeTitle(article.metadata.title)}.md`;
+    const filePath = `${folderPath}/${fileName}`  
+    return filePath;
   }
 
 }

@@ -17,8 +17,9 @@
   "author": "weichenw",
   "license": "MIT",
   "dependencies": {
-    "nunjucks": "^3.2.3",
-    "lodash.pickby": "^4.6.0"
+    "gray-matter": "^4.0.3",
+    "lodash.pickby": "^4.6.0",
+    "nunjucks": "^3.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",

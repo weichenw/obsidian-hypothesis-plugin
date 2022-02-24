@@ -27,7 +27,7 @@ export default class ResyncDelFileModal extends Modal {
 
     async onOpen() {
         super.onOpen()
-        const fileManager = new FileManager(this.vault);
+        const fileManager = new FileManager(this.vault, this.app.metadataCache);
 		this.syncHypothesis = new SyncHypothesis(fileManager);
         const deletedFiles = await this.retrieveDeletedFiles(this.vault);
 
