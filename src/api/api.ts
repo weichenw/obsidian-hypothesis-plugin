@@ -1,5 +1,6 @@
 
 import { Notice, moment } from 'obsidian';
+import axios from "axios";
 
 export default class ApiManager {
   readonly baseUrl: string = 'https://hypothes.is/api';
@@ -19,147 +20,83 @@ export default class ApiManager {
   }
 
   async getProfile() {
-    let response;
-    let data;
-
     try {
-      response = await fetch(`${this.baseUrl}/profile`, { headers: { ...this.getHeaders() } })
+      const response = await axios.get(`${this.baseUrl}/profile`, { headers: this.getHeaders() })
+      return response.data.userId
     }
     catch (e) {
-      new Notice('Authorization failed. Please check your API token and try again.')
-      console.error("Failed to fetch profile : ", e);
+      new Notice('Failed to authorize Hypothes.is user. Please check your API token and try again.')
+      console.error(e);
       return;
-    }
-
-    if (response && response.ok) {
-      data = await response.json();
-    } else {
-      new Notice('Authorization failed. Please check your API token and try again.')
-      console.error("Failed to fetch profile : ", response);
-      return;
-    }
-
-    if (data.userid) {
-      return data.userid;
-    } else {
-      //user not found
-      new Notice('User not found. Please check your API token and try again.')
     }
   }
 
-  async getHighlights(lastSyncDate?: Date) {
-    // let offset = 0;
-    let maxResult = 1000;
-    let initialQuery = true;
-    let result = [];
-    let response;
+  async getHighlights(lastSyncDate?: Date, limit = 2000) {
+    let annotations = [];
 
-    const queryDate = lastSyncDate ? `&search_after=${moment.utc(lastSyncDate).format()}` : '';
-    // const limit = lastSyncDate ? 200 : 100;
-    const limit = 200;
-
-    for (let resultCount = 0; resultCount < maxResult;) {
-
-      try {
-        response = await fetch(`${this.baseUrl}/search?user=${this.userid}&offset=${resultCount}&limit=${limit}&sort=updated&order=asc` + queryDate, { headers: { ...this.getHeaders() } })
-      }
-      catch (e) {
-        new Notice('Error occurs. Please check your API token and try again.')
-        console.log("Failed to fetch highlights : ", e);
-        return;
-      }
-
-      if (response && response.ok) {
-        const data = await response.json();
-
-        if (!data.rows.length) {
-          break;
-        }
-
-        //initial run to set total
-        if (initialQuery) {
-          if (data.total <= maxResult) {
-            //overwrite total
-            maxResult = data.total;
-            //no longer inital query to find total
-            initialQuery = !initialQuery;
+    try {
+      // Paginate API calls via search_after param
+      // search_after=null starts at with the earliest annotations
+      let newestTimestamp = lastSyncDate && moment.utc(lastSyncDate).format()
+      while (annotations.length < limit) {
+        const response = await axios.get(
+          `${this.baseUrl}/search`,
+          {
+            params: {
+              limit: 200, // Max pagination size
+              sort: "updated",
+              order: "asc", // Get all annotations since search_after
+              search_after: newestTimestamp,
+              user: this.userid,
+            },
+            headers: this.getHeaders()
           }
-        }
-
-        resultCount += data.rows.length;
-        result = [...result, ...data.rows];
-
-        //break loop. pagination doesnt work with search_after param
-        if (lastSyncDate) {
+        )
+        const newAnnotations = response.data.rows;
+        if (!newAnnotations.length) {
+          // No more annotations
           break;
         }
 
-      } else {
-        new Notice('Sync failed. Please check your API token and try again.')
-        console.log("Failed to fetch highlights : ", response);
-        return;
+        annotations = [ ...annotations, ...newAnnotations ];
+        newestTimestamp = newAnnotations[newAnnotations.length - 1].updated;
       }
 
-
+    } catch (e) {
+      new Notice('Failed to fetch Hypothes.is annotations. Please check your API token and try again.')
+      console.error(e);
     }
-    return result;
+
+    return annotations;
   }
 
-  async getHighlightWithUri(uri: string) {
-
-    let result = [];
-    let response;
-    const limit = 200;
-
+  async getHighlightWithUri(uri: string, limit = 200) {
     try {
-      response = await fetch(`${this.baseUrl}/search?user=${this.userid}&limit=${limit}&uri=${uri}&sort=updated&order=asc`, { headers: { ...this.getHeaders() } })
+      const response = await axios.get(`${this.baseUrl}/search`, {
+        params: {
+          limit, 
+          uri,
+          user: this.userid,
+          sort: "updated",
+          order: "asc"
+        },
+        headers: this.getHeaders()
+      })
+    
+      return response.data.rows;
+    } catch (e) {
+      new Notice('Failed to fetch Hypothes.is annotations. Please check your API token and try again.')
+      console.error(e);
     }
-    catch (e) {
-      new Notice('Error occurs. Please check your API token and try again.')
-      console.log("Failed to fetch highlights : ", e);
-      return;
-    }
-
-    if (response && response.ok) {
-      const data = await response.json();
-
-      result = data.rows;
-
-    } else {
-      new Notice('Sync failed. Please check your API token and try again.')
-      console.log("Failed to fetch highlights : ", response);
-      return;
-    }
-
-    return result;
-
   }
 
   async getGroups() {
-    let result = [];
-    let response;
-
     try {
-      response = await fetch(`${this.baseUrl}/groups`, { headers: { ...this.getHeaders() } })
+      const response = await axios.get(`${this.baseUrl}/groups`, { headers: this.getHeaders() })
+      return response.data
+    } catch (e) {
+      new Notice('Failed to fetch Hypothes.is annotation groups. Please check your API token and try again.')
+      console.error(e);
     }
-    catch (e) {
-      new Notice('Error occurs. Please check your API token and try again.')
-      console.log("Failed to fetch groups : ", e);
-      return;
-    }
-
-    if (response && response.ok) {
-      const data = await response.json();
-
-      result = data;
-
-    } else {
-      new Notice('Sync failed. Please check your API token and try again.')
-      console.log("Failed to fetch groups : ", response);
-      return;
-    }
-
-    return result;
   }
-
 }
