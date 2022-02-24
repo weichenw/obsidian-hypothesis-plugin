@@ -4,18 +4,22 @@ import { settingsStore } from '~/store';
 import { get } from 'svelte/store';
 import SyncHypothesis from '~/sync/syncHypothesis';
 import FileManager from '~/fileManager';
-import type { SyncedFile } from '~/models';
+import type { Article, SyncedFile } from '~/models';
+import ApiManager from '~/api/api';
+import parseSyncResponse from '~/parser/parseSyncResponse';
 
 export default class ResyncDelFileModal extends Modal {
     private syncHypothesis!: SyncHypothesis;
     public waitForClose: Promise<void>;
     private resolvePromise: () => void;
     private modalContent: ResyncDelFileModalContent;
-    vault: Vault;
+    private vault: Vault;
+    private fileManager: FileManager
 
     constructor(app: App) {
         super(app);
         this.vault = app.vault;
+        this.fileManager = new FileManager(this.vault, this.app.metadataCache);
 
         this.waitForClose = new Promise(
             (resolve) => (this.resolvePromise = resolve)
@@ -27,9 +31,8 @@ export default class ResyncDelFileModal extends Modal {
 
     async onOpen() {
         super.onOpen()
-        const fileManager = new FileManager(this.vault, this.app.metadataCache);
-		this.syncHypothesis = new SyncHypothesis(fileManager);
-        const deletedFiles = await this.retrieveDeletedFiles(this.vault);
+		this.syncHypothesis = new SyncHypothesis(this.fileManager);
+        const deletedFiles = await this.retrieveDeletedFiles();
 
         this.titleEl.innerText = "Hypothes.is: Resync deleted file(s)";
 
@@ -56,21 +59,20 @@ export default class ResyncDelFileModal extends Modal {
         this.resolvePromise();
     }
 
-    async retrieveDeletedFiles(vault:Vault) {
+    async retrieveDeletedFiles(): Promise<SyncedFile[]> {
+        const token = get(settingsStore).token;
+        const userid = get(settingsStore).user;
+        const apiManager = new ApiManager(token, userid);
 
-        const folder = get(settingsStore).highlightsFolder;
-        const syncedFiles = get(settingsStore).syncedFiles;
+        // Fetch all annotated articles that *should* be present
+        const allAnnotations = await apiManager.getHighlights()
+        const allArticles: [] = Object.values(await parseSyncResponse(allAnnotations));
 
-        const existingFiles = await vault.adapter.list(`/${folder}`);
-
-        // eslint-disable-next-line
-        const r = /[^\/]*$/;
-
-        existingFiles.files.forEach(function(value, index) {
-            this[index] = (value.match(r))[0]
-        }, existingFiles.files);
-
-        return syncedFiles.filter((file) =>  !existingFiles.files.includes(file.filename));
+        // Check which files are actually present
+        const deletedArticles = await Promise.all(allArticles.filter(async article => !(await this.fileManager.isArticleSaved(article))));
+        return deletedArticles.map((article: Article) => 
+            ({ uri: article.metadata.url, filename: this.fileManager.getNewArticleFilePath(article)})
+        );
     }
 
     async startResync(selectedFiles: SyncedFile[]): Promise<void> {

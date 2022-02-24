@@ -36,7 +36,7 @@ export default class FileManager {
       await this.vault.modify(existingFile, fileContent);
       return false;
     } else {
-      const newFilePath = await this.getNewArticleFilePath(article);
+      const newFilePath = this.getNewArticleFilePath(article);
       console.debug(`Creating ${newFilePath}`);
 
       const markdownContent = this.renderer.render(article, true);
@@ -45,6 +45,11 @@ export default class FileManager {
       await this.vault.create(newFilePath, fileContent);
       return true;
     }
+  }
+
+  public async isArticleSaved(article: Article): Promise<boolean> {
+    const file = await this.getArticleFile(article);
+    return !!file
   }
 
   private async getArticleFile(article: Article): Promise<TFile | null> {
@@ -65,13 +70,9 @@ export default class FileManager {
       .map(({ file, frontmatter }): AnnotationFile => ({file, articleUrl: frontmatter["url"]}))
   }
 
-  private async getNewArticleFilePath(article: Article): Promise<string> {
+  public getNewArticleFilePath(article: Article): string {
     const settings = get(settingsStore);
     let folderPath = settings.highlightsFolder;
-
-    if (!(await this.vault.adapter.exists(folderPath))) {
-      await this.vault.createFolder(folderPath);
-    }
 
     const fileName = `${sanitizeTitle(article.metadata.title)}.md`;
     const filePath = `${folderPath}/${fileName}`  
