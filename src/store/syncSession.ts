@@ -72,7 +72,7 @@ const createSyncSessionStore = () => {
 
   const setJobs = (articles: Article[]) => {
     store.update((state) => {
-      for (const article of Object.values(articles)) {
+      for (const article of articles) {
         state.jobs.push({ status: 'idle', articleId: article.id });
       }
       return state;
