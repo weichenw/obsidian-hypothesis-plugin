@@ -42,6 +42,7 @@ export class SettingsTab extends PluginSettingTab {
     }
     this.autoSyncInterval();
     this.highlightsFolder();
+    this.folderPath();
     this.syncOnBoot();
     this.dateFormat();
     this.template();
@@ -176,6 +177,19 @@ export class SettingsTab extends PluginSettingTab {
           });
         return text;
       });
+  }
+
+  private folderPath(): void {
+    new Setting(this.containerEl)
+    .setName('Use domain folders')
+    .setDesc('Group generated files into folders based on the domain of the annotated URL')
+    .addToggle((toggle) =>
+      toggle
+        .setValue(get(settingsStore).useDomainFolders)
+        .onChange(async (value) => {
+          await settingsStore.actions.setUseDomainFolder(value);
+        })
+    );
   }
 
   private syncOnBoot(): void {

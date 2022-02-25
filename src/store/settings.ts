@@ -21,6 +21,7 @@ type Settings = {
   autoSyncInterval: number;
   syncedFiles: SyncedFile[];
   groups: Group[];
+  useDomainFolders: boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -37,7 +38,8 @@ const DEFAULT_SETTINGS: Settings = {
     totalHighlights: 0,
   },
   syncedFiles: [],
-  groups: []
+  groups: [],
+  useDomainFolders: false,
 };
 
 const createSettingsStore = () => {
@@ -181,6 +183,13 @@ const createSettingsStore = () => {
     });
   };
 
+  const setUseDomainFolder = (value: boolean) => {
+    store.update((state) => {
+      state.useDomainFolders = value;
+      return state;
+    });
+  };
+
   return {
     subscribe: store.subscribe,
     initialise,
@@ -197,7 +206,8 @@ const createSettingsStore = () => {
       setDateTimeFormat,
       addSyncedFile,
       setGroups,
-      resetGroups
+      resetGroups,
+      setUseDomainFolder,
     },
   };
 };
