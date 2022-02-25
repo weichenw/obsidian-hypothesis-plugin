@@ -22,7 +22,7 @@ export default class ApiManager {
   async getProfile() {
     try {
       const response = await axios.get(`${this.baseUrl}/profile`, { headers: this.getHeaders() })
-      return response.data.userId
+      return response.data.userid
     }
     catch (e) {
       new Notice('Failed to authorize Hypothes.is user. Please check your API token and try again.')
