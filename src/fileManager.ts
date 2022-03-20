@@ -36,7 +36,6 @@ export default class FileManager {
   public async saveArticle(article: Article): Promise<boolean> {
     const existingFile = await this.getArticleFile(article);
 
-    console.log(existingFile)
     if (existingFile) {
       console.debug(`Updating ${existingFile.path}`);
 
