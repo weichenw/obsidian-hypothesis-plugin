@@ -76,8 +76,6 @@ const parseSyncResponse = (data): Article[] => {
     const momentFormat = get(settingsStore).dateTimeFormat;
     const groups = get(settingsStore).groups;
 
-    console.log(groups)
-
     // Group annotations per article
     const articlesMap = data.reduce((result, annotationData) => {
         const url = annotationData['uri'];
@@ -88,10 +86,8 @@ const parseSyncResponse = (data): Article[] => {
             return result;
         }
 
-        console.log(annotationData)
         // Check if group is selected
         const group = groups.find(k => k.id == annotationData['group']);
-        console.log(group)
         if (!group.selected) {
             return result;
         }
