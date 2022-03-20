@@ -36,6 +36,7 @@ export default class FileManager {
   public async saveArticle(article: Article): Promise<boolean> {
     const existingFile = await this.getArticleFile(article);
 
+    console.log(existingFile)
     if (existingFile) {
       console.debug(`Updating ${existingFile.path}`);
 
@@ -46,7 +47,7 @@ export default class FileManager {
       await this.vault.modify(existingFile, fileContent);
       return false;
     } else {
-      const newFilePath = this.getNewArticleFilePath(article);
+      const newFilePath = await this.getNewArticleFilePath(article);
       console.debug(`Creating ${newFilePath}`);
 
       const markdownContent = this.renderer.render(article, true);
@@ -55,6 +56,10 @@ export default class FileManager {
       await this.vault.create(newFilePath, fileContent);
       return true;
     }
+  }
+
+  public async createFolder(folderPath: string): Promise<void> {
+    await this.vault.createFolder(folderPath);
   }
 
   public async isArticleSaved(article: Article): Promise<boolean> {
@@ -80,12 +85,19 @@ export default class FileManager {
       .map(({ file, frontmatter }): AnnotationFile => ({ file, articleUrl: frontmatter["url"] }))
   }
 
-  public getNewArticleFilePath(article: Article): string {
+  public async getNewArticleFilePath(article: Article): Promise<string> {
     const folderPath = articleFolderPath(article);
+
+    if (!(await this.vault.adapter.exists(folderPath))) {
+      console.info(`Folder ${folderPath} not found. Will be created`);
+      await this.createFolder(folderPath);
+    }
+
     const fileName = `${sanitizeTitle(article.metadata.title)}.md`;
     const filePath = `${folderPath}/${fileName}`
     return filePath;
   }
+
 
 }
 

@@ -36,7 +36,7 @@ const parseTitleFromUrl = (url: string) => {
     return pathname.replaceAll('/', '-');
 }
 
-const parseHighlight = (annotationData, momentFormat: string): Highlights => {
+const parseHighlight = (annotationData, groupName: string, momentFormat: string): Highlights => {
     try {
         // Get highlighted text or reply
         let isReply, highlightText = null;
@@ -61,7 +61,7 @@ const parseHighlight = (annotationData, momentFormat: string): Highlights => {
             user: annotationData['user'],
             annotation: annotationData['text'],
             tags: annotationData['tags'],
-            group: annotationData.name,
+            group: groupName,
             isReply,
         }
     } catch (error) {
@@ -76,6 +76,8 @@ const parseSyncResponse = (data): Article[] => {
     const momentFormat = get(settingsStore).dateTimeFormat;
     const groups = get(settingsStore).groups;
 
+    console.log(groups)
+
     // Group annotations per article
     const articlesMap = data.reduce((result, annotationData) => {
         const url = annotationData['uri'];
@@ -86,11 +88,14 @@ const parseSyncResponse = (data): Article[] => {
             return result;
         }
 
+        console.log(annotationData)
         // Check if group is selected
         const group = groups.find(k => k.id == annotationData['group']);
+        console.log(group)
         if (!group.selected) {
             return result;
         }
+
 
         const title = annotationData['document']['title']?.[0] || parseTitleFromUrl(url);
         const author = parseAuthorUrl(url);
@@ -99,7 +104,7 @@ const parseSyncResponse = (data): Article[] => {
             result[md5Hash] = { id: md5Hash, metadata: { title, url, author }, highlights: [], page_notes: [] };
         }
 
-        const annotation = parseHighlight(annotationData, momentFormat)
+        const annotation = parseHighlight(annotationData, group.name, momentFormat)
         if (!annotation.text && !annotation.isReply) {
             result[md5Hash].page_notes.push(annotation);
         } else {

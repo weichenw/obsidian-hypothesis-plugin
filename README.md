@@ -22,6 +22,7 @@ Use Hypothesis icon on the side icon ribbon or command to trigger manual sync.
 - `Disconnect`: Remove API Token from Obsidian
 - `Auto Sync Interval`: Set the interval in minutes to sync Hypothesis highlights automatically
 - `Highlights folder`: Specify the folder location for your Hypothesis articles
+- `Use domain folders`: Group generated files into folders based on the domain of the annotated URL
 - `Sync on startup`: Automatically sync highlights when open Obsidian
 - `Highlights template`: Nunjuck template for rendering your highlights
 - `Groups`: Add/remove group to be synced
