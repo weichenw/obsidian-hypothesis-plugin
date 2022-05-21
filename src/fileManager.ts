@@ -92,8 +92,17 @@ export default class FileManager {
       await this.createFolder(folderPath);
     }
 
-    const fileName = `${sanitizeTitle(article.metadata.title)}.md`;
-    const filePath = `${folderPath}/${fileName}`
+    let fileName = `${sanitizeTitle(article.metadata.title)}.md`;
+    let filePath = `${folderPath}/${fileName}`
+
+    let suffix = 1;
+    const tfiles = this.vault.getMarkdownFiles();
+    while (tfiles.find((tfile) => tfile.path === filePath)) {
+      console.debug(`${filePath} alreay exists`)
+      fileName = `${sanitizeTitle(article.metadata.title)} (${suffix++}).md`;
+      filePath = `${folderPath}/${fileName}`;
+    }
+
     return filePath;
   }
 
