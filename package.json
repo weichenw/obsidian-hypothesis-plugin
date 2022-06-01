@@ -33,7 +33,7 @@
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^8.1.1",
     "crypto-js": "^4.1.1",
-    "electron": "^12.0.4",
+    "electron": ">=13.6.6",
     "eslint": "^8.0.0",
     "obsidian": "^0.12.0",
     "rimraf": "^3.0.2",
