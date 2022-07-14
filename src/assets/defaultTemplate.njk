@@ -1,6 +1,5 @@
 {% if is_new_article %}
 # {{title}}
-
 ## Metadata
 {% if author %}- Author: [{{author}}]({{authorUrl}}){% endif %}
 - Title: {{title}}
@@ -8,7 +7,7 @@
 - Category: #article
 {% endif %}
 
-{%- if is_new_article %}
+{% if page_notes.length > 0 %}
 ## Page Notes
 {% for highlight in page_notes -%}
 {{highlight.annotation}}
@@ -16,15 +15,18 @@
 Tags: {% for tag in highlight.tags -%} #{{tag | replace(" ", "-")+" "}}{%- endfor %}
 {% endif %}
 {% endfor %}
-{%- endif -%}
+{% endif %}
 
-{%- if is_new_article -%}
+{% if is_new_article %}
 ## Highlights
+{% endif %}
 {% for highlight in highlights -%}
 - {{highlight.text}} — [Updated on {{highlight.updated}}]({{highlight.incontext}})
-{%- if 'Private' != highlight.group %} — Group: #{{highlight.group | replace(" ", "-")}}{% endif %}
+{%- if 'Private' != highlight.group %} 
+- Group: #{{highlight.group | replace(" ", "-")}}{% endif %}
 {% if highlight.tags | length %}    - Tags: {% for tag in highlight.tags %} #{{tag | replace(" ", "-")+" "}}{% endfor %}
 {% endif -%}
-{% if highlight.annotation %}    - Annotation: {{highlight.annotation}}{% endif %}
-{% endfor %}
+{% if highlight.annotation %}    - Annotation:
+      {{highlight.annotation}}
 {% endif %}
+{% endfor %}
