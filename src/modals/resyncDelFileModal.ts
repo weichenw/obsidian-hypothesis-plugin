@@ -70,9 +70,9 @@ export default class ResyncDelFileModal extends Modal {
 
         // Check which files are actually present
         const deletedArticles = await Promise.all(allArticles.filter(async article => !(await this.fileManager.isArticleSaved(article))));
-        return deletedArticles.map((article: Article) => 
-            ({ uri: article.metadata.url, filename: this.fileManager.getNewArticleFilePath(article)})
-        );
+        return await Promise.all(deletedArticles.map(async (article: Article) => 
+            ({ uri: article.metadata.url, filename: (await this.fileManager.getNewArticleFilePath(article)).split('//')[1]})
+        ));
     }
 
     async startResync(selectedFiles: SyncedFile[]): Promise<void> {
