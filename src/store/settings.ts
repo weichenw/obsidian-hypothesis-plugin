@@ -21,6 +21,7 @@ type Settings = {
   autoSyncInterval: number;
   groups: Group[];
   useDomainFolders: boolean;
+  useURLPathFolders: boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -37,7 +38,8 @@ const DEFAULT_SETTINGS: Settings = {
     totalHighlights: 0,
   },
   groups: [],
-  useDomainFolders: false
+  useDomainFolders: false,
+  useURLPathFolders: false
 };
 
 const createSettingsStore = () => {
@@ -173,6 +175,13 @@ const createSettingsStore = () => {
     });
   };
 
+  const setURLPathFolders = (value: boolean) => {
+    store.update((state) => {
+      state.useURLPathFolders = value;
+      return state;
+    });
+  };
+
   return {
     subscribe: store.subscribe,
     initialise,
@@ -190,6 +199,7 @@ const createSettingsStore = () => {
       setGroups,
       resetGroups,
       setUseDomainFolder,
+      setURLPathFolders
     },
   };
 };

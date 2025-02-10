@@ -43,6 +43,7 @@ export class SettingsTab extends PluginSettingTab {
     this.autoSyncInterval();
     this.highlightsFolder();
     this.folderPath();
+    this.folderURLPath()
     this.syncOnBoot();
     this.dateFormat();
     this.template();
@@ -188,6 +189,22 @@ export class SettingsTab extends PluginSettingTab {
         .setValue(get(settingsStore).useDomainFolders)
         .onChange(async (value) => {
           await settingsStore.actions.setUseDomainFolder(value);
+        })
+    );
+  }
+
+  private folderURLPath(): void {
+
+    new Setting(this.containerEl)
+    .setName('Use URL path folders')
+    .setDesc('The generated file directory is based on the path of the highlight URL.' +
+        'This option is designed to prevent filename conflicts caused by identical webpage titles under different paths of a website' +
+        'It is recommended to enable this option only when "Use domain folders" is enabled.')
+    .addToggle((toggle) =>
+      toggle
+        .setValue(get(settingsStore).useDomainFolders)
+        .onChange(async (value) => {
+          await settingsStore.actions.setURLPathFolders(value);
         })
     );
   }

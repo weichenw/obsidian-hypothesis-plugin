@@ -13,12 +13,19 @@ type AnnotationFile = {
 
 const articleFolderPath = (article: Article): string => {
   const settings = get(settingsStore);
+  let folderPath = settings.highlightsFolder;
+
   if (settings.useDomainFolders) {
     // "metadata.author" is equal to the article domain at the moment
-    return `${settings.highlightsFolder}/${article.metadata.author}`;
+      folderPath = `${folderPath}/${article.metadata.author}`;
   }
 
-  return settings.highlightsFolder;
+  if (settings.useURLPathFolders) {
+      const pathname = new URL(article.metadata.url).pathname.replace(/\/$/, '');
+      folderPath = `${folderPath}/${pathname}`;
+  }
+
+  return folderPath;
 };
 
 export default class FileManager {
