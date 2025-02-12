@@ -14,6 +14,7 @@ export type Metadata = {
 
 export type Highlights = {
   id?: string;
+  id_base62?: string;
   created: string;
   updated: string;
   text: string;

@@ -48,6 +48,7 @@
     "typescript": "^4.2.4",
     "webpack": "^5.30.0",
     "webpack-cli": "^4.6.0",
-    "webpack-node-externals": "^2.5.2"
+    "webpack-node-externals": "^2.5.2",
+    "base-x": "^4.0.0"
   }
 }

@@ -16,7 +16,8 @@ Article Metadata
 
 Highlight
 <ul>
-  <li><span class="u-pop">{{id}}</span> - Unique Id</li>
+  <li><span class="u-pop">{{id}}</span> - Unique Id<br/>May contain the character <code>_</code> , <br/>cannot be used as an obsidian block reference id</li>
+  <li><span class="u-pop">{{id_base62}}</span> - Unique id after base62 encoding<br/> Character sets:<br/> <code>0</code> to <code>9</code>, <code>A</code> to <code>Z</code>, <code>a</code> to <code>z</code></li>
   <li><span class="u-pop">{{text}}</span> - Text</li>
   <li><span class="u-pop">{{color}}</span> - Highlight color</li>
   <li><span class="u-pop">{{incontext}}</span> - Link to Highlight in context</li>

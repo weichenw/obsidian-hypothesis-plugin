@@ -2,7 +2,11 @@ import md5 from 'crypto-js/md5';
 import { moment } from 'obsidian';
 import { settingsStore } from '~/store';
 import { get } from 'svelte/store';
+import basex from 'base-x';
 import type { Article, Highlights } from '../models'
+
+const BASE62_CHARSET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const base62 = basex(BASE62_CHARSET);
 
 const parseAuthorUrl = (url: string) => {
     const domain = (new URL(url));
@@ -52,8 +56,16 @@ const parseHighlight = (annotationData, groupName: string, momentFormat: string)
             }
         }
 
+        const id = annotationData['id'];
+        let id_base62 = null;
+        if(id != null){
+            const uint8Array = Buffer.from(id, 'utf-8');
+            id_base62 = base62.encode(uint8Array);
+        }
+
         return {
-            id: annotationData['id'],
+            id,
+            id_base62,
             created: moment(annotationData['created']).format(momentFormat),
             updated: moment(annotationData['updated']).format(momentFormat),
             text: highlightText && cleanTextSelectorHighlight(highlightText),
