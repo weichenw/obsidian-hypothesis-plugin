@@ -1,5 +1,7 @@
 ## Obsidian Hypothesis Plugin (Community Plugin)
 
+> ⚠️ **This plugin is no longer maintained and this repository has been archived.** It will not receive bug fixes, updates, or support. It may be removed from the Obsidian Community Plugins directory.
+
 Obsidian Hypothesis (Community Plugin) is an unofficial plugin to synchronize [Hypothesis](https://hypothes.is/) **web** article highlights/annotations into your Obsidian Vault.
 
 <a href="https://www.buymeacoffee.com/fatwombat"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=fatwombat&button_colour=BD5FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00"></a>
